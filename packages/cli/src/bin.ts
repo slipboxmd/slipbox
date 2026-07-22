@@ -32,6 +32,11 @@ if (args.includes("--help") || args.includes("-h")) {
 const { launch } = await import("./launch.js");
 launch().catch((err: unknown) => {
 	const msg = err instanceof Error ? (err.stack ?? err.message) : String(err);
-	console.error(`slipbox: ${msg}`);
+	console.error(`\nslipbox: ${msg}`);
+	console.error(
+		"\nIf this happened around login: authenticate with the Pi CLI first —\n" +
+			"  run `pi`, use /login, finish auth, then quit and run `slipbox` again.\n" +
+			"slipbox reuses your Pi login from ~/.pi/agent.",
+	);
 	process.exit(1);
 });
