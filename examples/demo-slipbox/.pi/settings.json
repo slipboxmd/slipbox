@@ -1,0 +1,4 @@
+{
+  "extensions": ["../../packages/core/src/extension.ts"],
+  "skills": ["../../packages/core/skills"]
+}

@@ -1,0 +1,29 @@
+---
+qmd:
+  collection: slipbox
+  search_mode: query
+
+clustering:
+  method: connected-components
+  # Cosine similarity at/above which two chunks join the same idea cluster.
+  # embeddinggemma prose baselines ~0.72, so 0.75 keeps distinct topics apart.
+  threshold: 0.75
+  min_cluster_size: 1
+
+notes:
+  id_style: timestamp
+  link_style: wikilink
+  frontmatter: yaml
+---
+
+# House style
+
+- Write each literature note as a **single atomic idea**, restated in your own
+  words — never a quote dump. If it needs two ideas, make two notes.
+- Keep notes short and self-contained: a reader should understand the idea
+  without opening the source.
+- Title each note as a full sentence that states the idea (e.g. "Retrieval
+  practice strengthens memory more than rereading").
+- Tag with lowercase, hyphenated topics.
+- Always link a note back to its source reference, and to related notes when you
+  see a connection.
