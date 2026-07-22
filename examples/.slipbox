@@ -1,0 +1,33 @@
+---
+paths:
+  references: references/
+  reference_notes: reference-notes/
+  literature_notes: literature-notes/
+  permanent_notes: permanent-notes/
+  maps: maps/
+  sources: sources/
+  index: .slipbox-index/
+
+# Index/embeddings/search are handled by QMD (github.com/tobi/qmd).
+# Set the embedding model in .qmd/index.yml or via QMD_EMBED_MODEL.
+qmd:
+  collection: slipbox
+  search_mode: query
+
+clustering:
+  method: hdbscan
+  min_cluster_size: 4
+
+notes:
+  id_style: timestamp
+  link_style: wikilink
+  frontmatter: yaml
+---
+
+# House style
+
+- Write literature notes as a single atomic idea in plain, first-person prose.
+- Keep notes short — if it needs two ideas, make two notes.
+- Tag with lowercase, hyphenated topics.
+- Always link a note back to its source reference.
+- Favor connections: when a new note relates to an existing one, link them.
