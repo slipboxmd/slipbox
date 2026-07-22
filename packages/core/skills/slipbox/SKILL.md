@@ -46,15 +46,27 @@ than one silent batch. Show what you found before writing many files.
 ## Rules
 
 - Flat markdown only. YAML frontmatter + `[[wikilinks]]`. Never invent a DB.
-- The derived index (`.slipbox-index/`) is a rebuildable cache — safe to delete
-  and regenerate; never the source of truth.
+- QMD's index (`.qmd/`) is a rebuildable cache — safe to delete and regenerate
+  via `slipbox_reindex`; never the source of truth.
 - One idea per literature/permanent note. Split, don't cram.
 - Always link a note back to where it came from.
 - When unsure whether to keep a draft, ask.
 
 ## Tools
 
-Prefer the `slipbox_*` tools (see the harness) over hand-rolling files:
-`slipbox_ingest`, `slipbox_search`, `slipbox_link`, `slipbox_cluster`,
-`slipbox_moc`, `slipbox_reindex`, `slipbox_status`. (Several are still being
-built — check what's registered.)
+Use the `slipbox_*` tools rather than hand-rolling files:
+
+- `slipbox_doctor` — check qmd + extractor CLIs; guide the user to install any gaps.
+- `slipbox_ingest(source)` — extract → index/embed → cluster; returns idea
+  clusters (with excerpts + chunk seqs) for you to write notes from.
+- `slipbox_write_note(title, body, source, …)` — write ONE literature note per
+  cluster, in the user's words, linked to the source reference.
+- `slipbox_write_reference_note(reference, title, summary, literature_links)` —
+  the source-level summary, after the literature notes exist.
+- `slipbox_search(query, mode?)` — find related notes (query/vsearch/search).
+- `slipbox_reindex()` — rebuild the index after hand edits.
+- `slipbox_status()` — counts by type + index/tool readiness.
+
+Typical flow: `slipbox_doctor` → `slipbox_ingest` → review clusters →
+`slipbox_write_note` per cluster → `slipbox_write_reference_note`. (Planned:
+`slipbox_moc`, permanent-note promotion — not built yet.)

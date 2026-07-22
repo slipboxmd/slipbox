@@ -1,47 +1,66 @@
 /**
- * pi-slipbox — Pi extension entry point.
+ * @slipbox/core — Pi extension entry point.
  *
- * SCAFFOLD / PLACEHOLDER. This registers the shape of the harness (commands +
- * a status tool) so the wiring is clear. The real pipeline tools (ingest,
- * search, cluster, moc, …) land once Phase-1 design is settled — see
- * docs/ARCHITECTURE.md.
+ * Registers the slipbox toolset and injects the slipbox's house style into the
+ * agent's context. The Zettelkasten workflow lives in skills/slipbox/SKILL.md.
  */
-import { Type } from "typebox";
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { loadConfig } from "./config/slipbox-config.js";
+import { registerDoctor } from "./tools/doctor.js";
+import { registerIngest } from "./tools/ingest.js";
+import { registerReindex } from "./tools/reindex.js";
+import { registerSearch } from "./tools/search.js";
+import { registerStatus } from "./tools/status.js";
+import { registerWrite } from "./tools/write.js";
 
-export default function slipbox(pi: ExtensionAPI) {
-	// One-time setup runs before session_start (async factory supported).
+const HOUSE_STYLE_MARKER = "slipbox:house-style";
 
-	pi.on("session_start", async (_event, ctx) => {
-		ctx.ui.notify("pi-slipbox loaded (scaffold)", "info");
-		// TODO: locate + parse the nearest `.slipbox` config from ctx.cwd upward.
+export default function slipbox(pi: ExtensionAPI): void {
+	registerDoctor(pi);
+	registerIngest(pi);
+	registerWrite(pi);
+	registerSearch(pi);
+	registerReindex(pi);
+	registerStatus(pi);
+
+	let injected = false;
+
+	pi.on("session_start", async (_event: unknown, ctx: ExtensionContext) => {
+		injected = false;
+		try {
+			const config = loadConfig(ctx.cwd);
+			if (config.found) ctx.ui.setStatus?.("slipbox", `slipbox: ${config.root}`);
+		} catch {
+			/* no config yet — fine */
+		}
 	});
 
-	// TODO(context event): inject the slipbox's house-style config into the
-	// agent's context each turn so it always knows this slipbox's conventions.
-
-	pi.registerTool({
-		name: "slipbox_status",
-		label: "Slipbox status",
-		description:
-			"Report the state of the slipbox: note counts by type, orphans, and " +
-			"whether the derived index is up to date. (Scaffold: not yet implemented.)",
-		promptSnippet: "Use to check the health and size of the slipbox.",
-		parameters: Type.Object({}),
-		async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
-			return {
-				content: [
-					{
-						type: "text",
-						text: "slipbox_status is not implemented yet — Phase 1 pipeline pending.",
-					},
-				],
-				details: {},
-			};
-		},
+	// Inject the slipbox house style once per session so the agent always writes
+	// notes to this slipbox's conventions.
+	pi.on("context", async (event, ctx) => {
+		if (injected) return;
+		let config;
+		try {
+			config = loadConfig(ctx.cwd);
+		} catch {
+			return;
+		}
+		if (!config.found || !config.houseStyle) return;
+		injected = true;
+		if (messagesContain(event.messages, HOUSE_STYLE_MARKER)) return;
+		const text = `<${HOUSE_STYLE_MARKER}>\nThis slipbox's house style (follow it when writing notes):\n\n${config.houseStyle}\n</${HOUSE_STYLE_MARKER}>`;
+		const message = { role: "user" as const, content: [{ type: "text" as const, text }], timestamp: Date.now() };
+		return { messages: [message, ...event.messages] };
 	});
+}
 
-	// Planned tools (see docs/ARCHITECTURE.md "Tool surface"):
-	//   slipbox_ingest, slipbox_search, slipbox_link,
-	//   slipbox_cluster, slipbox_moc, slipbox_reindex
+function messagesContain(messages: readonly unknown[], marker: string): boolean {
+	return messages.some((m) => {
+		const content = (m as { content?: unknown } | null)?.content;
+		if (typeof content === "string") return content.includes(marker);
+		if (!Array.isArray(content)) return false;
+		return content.some(
+			(p) => p && typeof p === "object" && "text" in p && typeof (p as { text: unknown }).text === "string" && (p as { text: string }).text.includes(marker),
+		);
+	});
 }

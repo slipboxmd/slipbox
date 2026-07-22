@@ -14,3 +14,6 @@ dist/
 # The .qmd/index.yml may be committed; the sqlite database should not be.
 .qmd/index.sqlite
 .qmd/*.sqlite-*
+
+# Never track a stray QMD index in the harness repo itself
+.qmd/

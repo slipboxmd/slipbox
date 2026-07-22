@@ -6,7 +6,7 @@ paths:
   permanent_notes: permanent-notes/
   maps: maps/
   sources: sources/
-  index: .slipbox-index/
+  index: .qmd/
 
 # Index/embeddings/search are handled by QMD (github.com/tobi/qmd).
 # Set the embedding model in .qmd/index.yml or via QMD_EMBED_MODEL.
@@ -15,8 +15,11 @@ qmd:
   search_mode: query
 
 clustering:
-  method: hdbscan
-  min_cluster_size: 4
+  method: connected-components
+  # Cosine similarity at/above which two chunks join the same idea cluster.
+  # embeddinggemma prose baselines ~0.72, so 0.75 keeps distinct topics apart.
+  threshold: 0.75
+  min_cluster_size: 1
 
 notes:
   id_style: timestamp
