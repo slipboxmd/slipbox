@@ -6,6 +6,7 @@
  */
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { registerInit } from "./commands/init.js";
+import { registerTutor } from "./commands/tutor.js";
 import { loadConfig } from "./config/slipbox-config.js";
 import { registerDoctor } from "./tools/doctor.js";
 import { registerIngest } from "./tools/ingest.js";
@@ -24,6 +25,7 @@ export default function slipbox(pi: ExtensionAPI): void {
 	registerReindex(pi);
 	registerStatus(pi);
 	registerInit(pi);
+	registerTutor(pi);
 
 	let injected = false;
 
