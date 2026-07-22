@@ -1,45 +1,21 @@
 {
-  "name": "pi-slipbox",
+  "name": "slipbox-harness",
   "version": "0.0.0",
-  "description": "A Pi.dev harness for building and maintaining a Zettelkasten slipbox from any source — chunk, embed, cluster, and grow flat-markdown notes.",
-  "type": "module",
+  "private": true,
+  "description": "Monorepo for the Slipbox harness — a Pi.dev-based Zettelkasten builder and its ecosystem packages.",
   "license": "MIT",
   "author": "Zachary Fleischmann",
-  "keywords": [
-    "pi",
-    "pi-agent",
-    "zettelkasten",
-    "slipbox",
-    "notes",
-    "knowledge-management",
-    "embeddings",
-    "rag"
-  ],
-  "files": [
-    "src",
-    "skills",
-    "docs",
-    "README.md",
-    "LICENSE"
-  ],
-  "pi": {
-    "extensions": [
-      "./src/extension.ts"
-    ],
-    "skills": [
-      "./skills"
-    ]
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=22"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "echo \"no tests yet\" && exit 0"
-  },
-  "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "test": "turbo test"
   },
   "devDependencies": {
-    "@earendil-works/pi-coding-agent": "*",
-    "typescript": "^5.6.0"
+    "turbo": "^2"
   }
 }
