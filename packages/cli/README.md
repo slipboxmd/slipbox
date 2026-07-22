@@ -57,3 +57,17 @@ cd ~/some-folder && slipbox
 
 The launcher reuses `~/.pi/agent`, so your Pi credentials and model choice carry
 over automatically.
+
+## Troubleshooting
+
+- **`/login` hangs on "Waiting for authentication…".** Known issue with the
+  embedded login flow: the OAuth device flow **does** complete and your
+  credentials **are** saved to `~/.pi/agent/auth.json`, but the TUI can fail to
+  return from the waiting screen. Press `esc`/`ctrl+c` (or close the tab), then
+  relaunch `slipbox` — you'll already be authenticated. Alternatively, log in
+  once with the `pi` CLI (`pi` → `/login`); `slipbox` reuses that login.
+- **`zsh: command not found: slipbox`.** Open a new terminal (or `source
+  ~/.zshrc`) so `~/Library/pnpm/bin` is on your PATH.
+- **The harness thinks a parent folder is the slipbox.** Slipbox discovery walks
+  up to the nearest `.slipbox`. Run `slipbox` in a clean folder (not nested under
+  an existing slipbox) and use `/init`.
