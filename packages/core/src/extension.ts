@@ -5,6 +5,7 @@
  * agent's context. The Zettelkasten workflow lives in skills/slipbox/SKILL.md.
  */
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { registerInit } from "./commands/init.js";
 import { loadConfig } from "./config/slipbox-config.js";
 import { registerDoctor } from "./tools/doctor.js";
 import { registerIngest } from "./tools/ingest.js";
@@ -22,11 +23,13 @@ export default function slipbox(pi: ExtensionAPI): void {
 	registerSearch(pi);
 	registerReindex(pi);
 	registerStatus(pi);
+	registerInit(pi);
 
 	let injected = false;
 
 	pi.on("session_start", async (_event: unknown, ctx: ExtensionContext) => {
 		injected = false;
+		ctx.ui.setTitle?.("slipbox");
 		try {
 			const config = loadConfig(ctx.cwd);
 			if (config.found) ctx.ui.setStatus?.("slipbox", `slipbox: ${config.root}`);

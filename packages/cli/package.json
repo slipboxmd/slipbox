@@ -1,0 +1,27 @@
+{
+  "name": "slipbox",
+  "version": "0.0.0",
+  "description": "Slipbox — a Zettelkasten harness for Pi. Build and grow a flat-markdown slipbox from any source.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Zachary Fleischmann",
+  "keywords": ["pi", "zettelkasten", "slipbox", "notes", "cli", "agent"],
+  "bin": {
+    "slipbox": "./dist/bin.js"
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/bin.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@slipbox/core": "workspace:*",
+    "@earendil-works/pi-coding-agent": "^0.81.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

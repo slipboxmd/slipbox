@@ -23,10 +23,18 @@ See [docs/plans/MONOREPO.md](docs/plans/MONOREPO.md).
 
 ```
 packages/
-  core/     @slipbox/core   The Slipbox harness: ingest → notes → search  (active)
+  core/     @slipbox/core   The harness: ingest → notes → search (Pi extension + skill)
+  cli/      slipbox         Standalone `slipbox` command (branded Pi launcher)
 apps/                        (future) explorer web app
 docs/                        Vision, architecture, Pi reference, plans
 ```
+
+**Two ways to use it:**
+1. **Standalone** — `npm i -g slipbox`, then run `slipbox` in any folder. It
+   launches a Pi-powered TUI preloaded with the slipbox tools + skill and reuses
+   your existing Pi login. Use `/init` to scaffold a folder into a slipbox.
+2. **As a Pi package** — add `@slipbox/core` to a project's `.pi/settings.json`
+   and drive it from your own `pi` session (see `examples/demo-slipbox`).
 
 Planned ecosystem packages (not built yet): `@slipbox/moc` (maps of content),
 `@slipbox/writing`, `@slipbox/study` (study guides), `@slipbox/srs` (spaced

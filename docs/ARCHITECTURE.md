@@ -101,6 +101,19 @@ picks the model — we just don't reimplement the machinery.
 step-by-step with human review at the seams; a one-shot/`--yolo` mode runs the
 whole pipeline for trusted bulk ingestion.
 
+**D7. Standalone `slipbox` command via the Pi SDK.** Alongside the "load
+`@slipbox/core` as a Pi package" mode, we ship a branded `slipbox` binary
+(`packages/cli`, npm name `slipbox`). It uses Pi's SDK
+(`createAgentSessionRuntime` + `createAgentSessionServices` with
+`resourceLoaderOptions.extensionFactories`/`additionalSkillPaths` +
+`InteractiveMode`) to launch the TUI preloaded with our extension + skill, and
+passes `agentDir: getAgentDir()` (`~/.pi/agent`) so it **reuses the user's
+existing Pi login, models, and settings** — Pi deliberately has no way to rename
+that dir, which is what makes credential reuse work. A `/init` slash command
+(registered by the extension) scaffolds a folder into a slipbox. `@slipbox/core`
+therefore exposes a library entry (`exports` → `dist/index.js`: the extension
+factory + `skillsDir`) in addition to its `pi` package field.
+
 **D6. Monorepo (pnpm + turbo).** The repo becomes a monorepo (see
 docs/plans/MONOREPO.md). `packages/core` (`@slipbox/core`) holds the ingestion
 pipeline, note management, linking, and search — nearly everything in this doc.
