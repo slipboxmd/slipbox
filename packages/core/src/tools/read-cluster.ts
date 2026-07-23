@@ -6,7 +6,7 @@ import { readChunks } from "../qmd/vectors.js";
 import { say } from "./result.js";
 import { qmdMissing } from "./search.js";
 
-const MAX_CHARS = 12_000;
+const MAX_CHARS = 40_000;
 
 export function registerReadCluster(pi: ExtensionAPI): void {
 	pi.registerTool({

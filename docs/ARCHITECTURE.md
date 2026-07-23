@@ -185,14 +185,18 @@ from O9's earlier options remain if needed.
 
 ## Tool surface (first sketch)
 
-- `slipbox_ingest(source)` — extract source → markdown, then drive QMD + write notes
+Built (M0+):
+- `slipbox_ingest(source)` — extract + clean → QMD index/embed → average-linkage cluster → ranked idea groups
+- `slipbox_read_cluster(source, seqs)` — full passages behind a cluster (so notes are substantive)
+- `slipbox_write_note(...)` / `slipbox_write_reference_note(...)` — write literature / reference notes
+- `slipbox_autolink({max_per_note, threshold})` — link literature notes to each other by similarity, across all sources
 - `slipbox_search(query, {mode, k})` — wraps `qmd query`/`vsearch`/`search --json`
 - `slipbox_reindex()` — `qmd update && qmd embed` (rebuild index from markdown)
-- `slipbox_cluster({scope})` — pull vectors (O4 spike) + cluster into idea groups
-- `slipbox_link(from, to, {relation})` — create/maintain `[[links]]`
-- `slipbox_moc(topic|cluster)` — draft a Map of Content
-- `slipbox_status()` — counts by type, orphans, QMD index freshness, missing CLIs
+- `slipbox_status()` — counts by type, QMD index freshness, tool readiness
 - `slipbox_doctor()` — check for qmd + extraction CLIs; print install guidance
+- commands: `/init` (scaffold a folder), `/tutor` (interactive tour)
+
+Planned: `slipbox_moc(topic|cluster)` — draft a Map of Content (Phase 4).
 
 ## External dependencies (detected + guided, per D2)
 

@@ -8,6 +8,7 @@ import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-a
 import { registerInit } from "./commands/init.js";
 import { registerTutor } from "./commands/tutor.js";
 import { loadConfig } from "./config/slipbox-config.js";
+import { registerAutolink } from "./tools/link.js";
 import { registerDoctor } from "./tools/doctor.js";
 import { registerIngest } from "./tools/ingest.js";
 import { registerReadCluster } from "./tools/read-cluster.js";
@@ -23,6 +24,7 @@ export default function slipbox(pi: ExtensionAPI): void {
 	registerIngest(pi);
 	registerReadCluster(pi);
 	registerWrite(pi);
+	registerAutolink(pi);
 	registerSearch(pi);
 	registerReindex(pi);
 	registerStatus(pi);
