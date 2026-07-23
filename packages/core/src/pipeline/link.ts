@@ -15,12 +15,20 @@ export interface AutolinkOptions {
 	minLinks: number;
 	/** Never link below this similarity, even to satisfy minLinks. */
 	floor: number;
+	/**
+	 * When false (default), only compute links FOR notes that have none yet (the
+	 * newly-written ones) — O(new × N) instead of O(N²), so it stays cheap as the
+	 * slipbox grows. When true, recompute links for every note.
+	 */
+	relinkAll: boolean;
 }
 
 export interface AutolinkResult {
+	/** Total literature notes in the slipbox. */
 	notes: number;
+	/** Notes we computed links for this run (new ones, or all if relinkAll). */
+	linkedFrom: number;
 	linksAdded: number;
-	pairs: number;
 }
 
 function normalize(v: number[]): number[] {
@@ -44,36 +52,53 @@ function wikilink(config: SlipboxConfig, relPath: string): string {
 	return config.notes.link_style === "markdown" ? `[${label}](${relNoExt}.md)` : `[[${relNoExt}]]`;
 }
 
+interface NoteState {
+	path: string;
+	vec: number[];
+	abs: string;
+	data: Record<string, unknown>;
+	body: string;
+	links: Set<string>;
+}
+
 /**
  * Connect literature notes to one another by embedding similarity, across ALL
- * sources in the slipbox. For each note, links its top-`k` most similar other
- * notes (>= `threshold`); links are made mutual and merged into each note's
- * `links:` frontmatter (existing links preserved). Idempotent — safe to re-run.
+ * sources in the slipbox. Links are mutual and merged into each note's `links:`
+ * frontmatter (existing links preserved), so it's idempotent.
  *
- * Assumes the notes are already embedded (run reindex first).
+ * By default this is **incremental**: it only computes neighbors for notes that
+ * don't have links yet (the newly-written ones), which keeps each ingest at
+ * O(new × N) rather than O(N²) as the slipbox grows. `relinkAll` recomputes all.
+ * Assumes the notes are embedded (run reindex first).
  */
 export async function autolink(config: SlipboxConfig, opts: AutolinkOptions): Promise<AutolinkResult> {
 	const litRel = config.paths.literature_notes.replace(/\/$/, "");
 
-	// One averaged vector per literature note (a note may be >1 chunk). Filter to
-	// literature notes IN THE QUERY — reading every source's chunk vectors would
-	// blow the heap on a multi-book corpus.
+	// One averaged, normalized vector per note. Filtered to literature notes in the
+	// query so we never load source-chunk vectors (would blow the heap on a corpus).
 	const chunks = (await readChunks(qmdDbPath(config.root), litRel)).filter((c) => c.path.includes(`${litRel}/`));
 	const byNote = new Map<string, number[][]>();
 	for (const c of chunks) {
 		if (!byNote.has(c.path)) byNote.set(c.path, []);
 		byNote.get(c.path)!.push(c.vector);
 	}
-	const notes = [...byNote.entries()].map(([path, vecs]) => {
+
+	const notes: NoteState[] = [];
+	for (const [path, vecs] of byNote) {
 		const dim = vecs[0]!.length;
 		const avg = new Array<number>(dim).fill(0);
 		for (const v of vecs) for (let i = 0; i < dim; i++) avg[i]! += v[i]!;
-		return { path, vec: normalize(avg) };
-	});
+		const abs = join(config.root, path);
+		const { data, body } = parseFrontmatter(await readFile(abs, "utf8"));
+		const links = new Set<string>(Array.isArray(data.links) ? data.links.map(String) : []);
+		notes.push({ path, vec: normalize(avg), abs, data, body, links });
+	}
 
 	const n = notes.length;
-	const links: Set<number>[] = notes.map(() => new Set<number>());
-	for (let i = 0; i < n; i++) {
+	const toAdd: Set<number>[] = notes.map(() => new Set<number>());
+	const fromIdx = notes.map((nt, i) => [nt, i] as const).filter(([nt]) => opts.relinkAll || nt.links.size === 0).map(([, i]) => i);
+
+	for (const i of fromIdx) {
 		const sims: Array<[number, number]> = [];
 		for (let j = 0; j < n; j++) {
 			if (j === i) continue;
@@ -83,34 +108,23 @@ export async function autolink(config: SlipboxConfig, opts: AutolinkOptions): Pr
 		let added = 0;
 		for (const [s, j] of sims) {
 			if (added >= opts.k) break;
-			if (s >= opts.threshold) {
-				// strong link
-			} else if (added < opts.minLinks && s >= opts.floor) {
-				// top up toward minLinks with the nearest neighbors (so nothing is orphaned)
-			} else {
-				break; // sorted desc: nothing left is worth linking
-			}
-			links[i]!.add(j);
-			links[j]!.add(i); // mutual
+			if (s < opts.threshold && !(added < opts.minLinks && s >= opts.floor)) break;
+			toAdd[i]!.add(j);
+			toAdd[j]!.add(i); // mutual
 			added++;
 		}
 	}
 
 	let linksAdded = 0;
-	let pairs = 0;
 	for (let i = 0; i < n; i++) {
-		if (links[i]!.size === 0) continue;
-		const abs = join(config.root, notes[i]!.path);
-		const content = await readFile(abs, "utf8");
-		const { data, body } = parseFrontmatter(content);
-		const existing = new Set<string>(Array.isArray(data.links) ? data.links.map(String) : []);
-		const before = existing.size;
-		for (const j of links[i]!) existing.add(wikilink(config, notes[j]!.path));
-		pairs += links[i]!.size;
-		linksAdded += existing.size - before;
-		data.links = [...existing];
-		await writeFile(abs, stringifyFrontmatter(data, body), "utf8");
+		if (toAdd[i]!.size === 0) continue;
+		const before = notes[i]!.links.size;
+		for (const j of toAdd[i]!) notes[i]!.links.add(wikilink(config, notes[j]!.path));
+		if (notes[i]!.links.size === before) continue;
+		linksAdded += notes[i]!.links.size - before;
+		notes[i]!.data.links = [...notes[i]!.links];
+		await writeFile(notes[i]!.abs, stringifyFrontmatter(notes[i]!.data, notes[i]!.body), "utf8");
 	}
 
-	return { notes: n, linksAdded, pairs: pairs / 2 };
+	return { notes: n, linkedFrom: fromIdx.length, linksAdded };
 }

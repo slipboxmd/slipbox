@@ -53,9 +53,10 @@ starting; if not, tell the user how to install them (`slipbox_doctor`).
    no length target** — a longer source naturally yields more notes; focus on the
    recurring themes, skip thin/repetitive/boilerplate ones, note standout one-offs,
    and don't cram unrelated ideas together.
-5. **Link the notes** — once all the literature notes exist, run
-   `slipbox_autolink` to connect related notes to each other by similarity, across
-   ALL sources in the slipbox (not just this one).
+5. **Link the notes** — after writing a source's notes, run `slipbox_autolink`.
+   It links the new notes into the network by similarity, across ALL sources
+   (not just this one). It's incremental (only the new notes), so it stays cheap
+   as the slipbox grows; use `relink_all` only for a deliberate full re-link.
 6. **Re-index** so the new notes are searchable (`slipbox_reindex`).
 7. **Fill in the reference** — `slipbox_write_reference_note` adds the
    whole-source summary + links to the literature notes onto the one reference
