@@ -12,8 +12,12 @@ export function registerWrite(pi: ExtensionAPI): void {
 			"source reference and the chunk seqs it came from. Call once per idea cluster from slipbox_ingest.",
 		promptSnippet: "Persist one literature note distilled from a source.",
 		parameters: Type.Object({
-			title: Type.String({ description: "One-line statement of the single idea" }),
-			body: Type.String({ description: "The idea in the user's own words (one atomic idea)" }),
+			title: Type.String({ description: "One-line statement of the single idea (a full sentence)" }),
+			body: Type.String({
+				description:
+					"The idea DEVELOPED in the user's own words — a substantial paragraph or two on ONE idea: state it, unfold the " +
+					"reasoning/evidence, and note why it matters. Not a one-line restatement. Draw on the full passages from slipbox_read_cluster.",
+			}),
 			source: Type.String({ description: "Source reference link from ingest, e.g. [[references/<id>]]" }),
 			tags: Type.Optional(Type.Array(Type.String(), { description: "lowercase, hyphenated topics" })),
 			chunks: Type.Optional(Type.Array(Type.Integer(), { description: "QMD chunk seq indices this idea came from" })),

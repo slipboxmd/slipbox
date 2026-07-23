@@ -36,9 +36,14 @@ notes:
 
 Instructions the agent should follow when writing notes for THIS slipbox.
 
-- Write each literature note as a **single atomic idea**, restated in your own
-  words — never a quote dump. If it needs two ideas, make two notes.
-- Keep notes short and self-contained.
+- One idea per literature note — but **develop it**. Write a substantial
+  paragraph (or two): state the idea in your own words, unfold the reasoning or
+  evidence behind it, and note why it matters or what it connects to. A good note
+  stands on its own and is genuinely useful months later without reopening the
+  source.
+- Don't shrink a rich passage to a single sentence, and don't merge unrelated
+  ideas to pad length. Depth on ONE idea; if it's really two ideas, make two notes.
+- Restate in your own words — never a quote dump.
 - Title each note as a full sentence that states the idea.
 - Tag with lowercase, hyphenated topics.
 - Always link a note back to its source reference, and to related notes.
