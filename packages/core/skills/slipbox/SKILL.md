@@ -32,10 +32,14 @@ starting; if not, tell the user how to install them (`slipbox_doctor`).
    slipbox as a reference.
 2. **Index + embed** via QMD (`qmd update` + `qmd embed`) — QMD chunks and
    embeds; do not build your own chunker/embedder.
-3. **Cluster** the chunk vectors by similarity — each cluster is a candidate
-   idea. (Harness-owned step.)
-4. **Write literature notes** — one atomic idea per cluster, in the user's
-   words, linked to the reference and the chunks it came from.
+3. **Cluster** the chunk vectors by similarity — each cluster of related
+   passages is a candidate idea. (Harness-owned step; boilerplate like licenses
+   is stripped before this.)
+4. **Write literature notes** — one atomic idea per SUBSTANTIVE cluster, in the
+   user's words, linked to the reference and its chunks. **No fixed count and no
+   quota by length** — a longer source naturally yields more notes. Focus on the
+   recurring themes (larger clusters), skip thin/repetitive/boilerplate ones, and
+   pick out any standout one-off passages. Don't cram unrelated ideas together.
 5. **Re-index** so the new literature notes are searchable (`qmd update`/`embed`).
 6. **Write the reference note** — a source-level summary linking to its
    literature notes.

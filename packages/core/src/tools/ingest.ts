@@ -13,9 +13,10 @@ export function registerIngest(pi: ExtensionAPI): void {
 		label: "Ingest source",
 		description:
 			"Ingest a source file into the slipbox: extract → write a source + reference record → index/embed with QMD → " +
-			"cluster the ideas by similarity. Returns candidate idea clusters (with excerpts) for you to turn into literature " +
-			"notes. Phase-1 supports .txt/.md sources. After this, write one literature note per cluster with slipbox_write_note, " +
-			"then a reference note with slipbox_write_reference_note.",
+			"cluster the passages into idea groups by similarity. Returns candidate idea clusters (recurring themes first, then " +
+			"one-off passages) with excerpts. Review them and write a literature note for each SUBSTANTIVE idea with " +
+			"slipbox_write_note — there is no fixed count: a longer source naturally yields more notes; skip thin or boilerplate " +
+			"clusters. Then write a reference note with slipbox_write_reference_note. Phase-1 supports .txt/.md sources.",
 		promptSnippet: "Bring a new source into the slipbox and get idea clusters to write notes from.",
 		parameters: Type.Object({
 			source: Type.String({ description: "Path to the source file (.txt or .md for now)" }),
@@ -34,23 +35,41 @@ export function registerIngest(pi: ExtensionAPI): void {
 	});
 }
 
+/** How many recurring-theme clusters to spell out before summarizing the rest. */
+const SHOW_THEMES = 40;
+const EXCERPT_LEN = 220;
+
 function renderIngest(r: import("../pipeline/ingest.js").IngestResult, found: boolean): string {
+	const themes = r.clusters.filter((c) => c.size >= 2);
+	const singles = r.clusters.filter((c) => c.size === 1);
+
 	const head = [
 		found ? "" : "Note: no .slipbox config found — used defaults in the current directory.",
 		`Ingested **${r.title}**.`,
 		`- reference: ${r.reference.link}  (${r.reference.relPath})`,
 		`- source text: ${r.source.relPath}`,
-		`- ${r.totalChunks} chunks → ${r.clusters.length} candidate idea cluster(s)`,
+		`- ${r.totalChunks} chunks → ${themes.length} recurring themes + ${singles.length} one-off passages`,
 		"",
-		"Now write ONE atomic literature note per cluster (in the user's words, per house style),",
-		`then a reference note. Use source link \`${r.reference.link}\` and the cluster's chunk seqs.`,
+		"Write a literature note (one atomic idea, the user's words, per house style) for each SUBSTANTIVE theme below.",
+		"There is no target count — a longer source yields more notes. Skip thin, repetitive, or boilerplate clusters,",
+		"and glance at the one-off passages for any standout ideas worth a note.",
+		`Use source link \`${r.reference.link}\` and each cluster's chunk seqs. Then write a reference note.`,
 		"",
+		"## Recurring themes (largest first)",
 	].filter(Boolean);
 
-	const body = r.clusters.map((c) => {
-		const excerpts = c.excerpts.map((e, i) => `   [${i + 1}] ${e}`).join("\n");
-		return `── Cluster ${c.index} (${c.size} chunk${c.size === 1 ? "" : "s"}, seqs ${c.chunkSeqs.join(", ")}) ──\n${excerpts}`;
+	const shown = themes.slice(0, SHOW_THEMES).map((c) => {
+		const excerpt = (c.excerpts[0] ?? "").slice(0, EXCERPT_LEN).replace(/\s+/g, " ").trim();
+		return `• Cluster ${c.index} — ${c.size} chunks (seqs ${c.chunkSeqs.join(", ")})\n    ${excerpt}…`;
 	});
+	if (themes.length > SHOW_THEMES) {
+		shown.push(`…and ${themes.length - SHOW_THEMES} more themes (full data in the tool result details).`);
+	}
 
-	return [...head, ...body].join("\n");
+	const tail =
+		singles.length > 0
+			? `\n${singles.length} one-off single-passage clusters are in the details — mine them for any standout ideas.`
+			: "";
+
+	return [...head, ...shown, tail].join("\n");
 }

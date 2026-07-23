@@ -145,9 +145,16 @@ style; (3) **QMD orchestration** — collection setup + `update`/`embed` lifecyc
   `float[768]`, cosine, **not normalized** (normalize first). Chunk text ≈
   `content.doc.slice(pos, nextPos)` (approximate; QMD chunks overlap ~15%).
   Fallback if we want exact chunk text: own-chunk + QMD `llm.embedBatch`.
-- **Clustering algorithm — STILL OPEN:** HDBSCAN (density, no k) vs k-means vs
-  agglomerative. HDBSCAN matched prometheus. In pure TS this means a JS port /
-  small lib. Decide during Phase-1 build.
+- **Clustering algorithm — RESOLVED → average-linkage agglomerative (UPGMA).**
+  Single-linkage/connected-components chains badly (on a 281-chunk book: 199
+  singletons at cosine 0.75, one 249-blob at 0.65 — no usable middle).
+  Average-linkage with a cosine cutoff (~0.64 default, configurable) gives a
+  sensible spread (~49 substantive clusters + tail) and isolates boilerplate into
+  its own cluster. Implemented in `pipeline/cluster.ts` (NN-array, O(n²) memory,
+  guarded at 4000 items). No note quotas — cluster count emerges from the text;
+  the agent writes notes for substantive clusters. Boilerplate (Project Gutenberg
+  headers/license) is stripped pre-chunk in `extract/clean.ts`. **Future:** a
+  two-level "themes → clusters" grouping and per-model cutoff calibration.
 
 ### O5. Chunking strategy — **RESOLVED → D3 (QMD chunks: ~900 tok, 15% overlap, smart boundaries).**
 

@@ -53,8 +53,8 @@ export function loadConfig(cwd: string): SlipboxConfig {
 			search_mode: str(qmd.search_mode, "query") as SearchMode,
 		},
 		clustering: {
-			method: str(clustering.method, "connected-components"),
-			threshold: num(clustering.threshold, 0.75),
+			method: str(clustering.method, "average-linkage"),
+			threshold: num(clustering.threshold, 0.64),
 			min_cluster_size: num(clustering.min_cluster_size, 1),
 		},
 		notes: {
@@ -72,7 +72,7 @@ function defaults(root: string, found: boolean, houseStyle: string): SlipboxConf
 		found,
 		paths: { ...DEFAULT_PATHS },
 		qmd: { collection: "slipbox", search_mode: "query" },
-		clustering: { method: "connected-components", threshold: 0.75, min_cluster_size: 1 },
+		clustering: { method: "average-linkage", threshold: 0.64, min_cluster_size: 1 },
 		notes: { id_style: "timestamp", link_style: "wikilink", frontmatter: "yaml" },
 		houseStyle,
 	};

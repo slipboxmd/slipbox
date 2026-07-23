@@ -1,3 +1,4 @@
+import { cleanSourceText } from "./clean.js";
 import type { Extracted, Extractor } from "./types.js";
 import { textExtractor } from "./text.js";
 
@@ -15,12 +16,15 @@ export class UnsupportedSourceError extends Error {
 	}
 }
 
-/** Dispatch a source to the first extractor that supports it. */
+/** Dispatch a source to the first extractor that supports it, then strip boilerplate. */
 export async function extract(source: string): Promise<Extracted> {
 	const extractor = EXTRACTORS.find((e) => e.supports(source));
 	if (!extractor) throw new UnsupportedSourceError(source);
-	return extractor.extract(source);
+	const result = await extractor.extract(source);
+	const cleaned = cleanSourceText(result.markdown);
+	return { ...result, markdown: cleaned.text };
 }
 
 export type { Extracted, Extractor } from "./types.js";
 export { textExtractor } from "./text.js";
+export { cleanSourceText } from "./clean.js";

@@ -19,10 +19,11 @@ qmd:
   search_mode: query
 
 clustering:
-  method: connected-components
-  # Cosine similarity at/above which two chunks join the same idea cluster.
-  # embeddinggemma prose baselines ~0.72, so 0.75 keeps distinct topics apart.
-  threshold: 0.75
+  method: average-linkage
+  # Average-linkage cosine cutoff (0..1): merge clusters while their average
+  # similarity is >= this. Higher = more, tighter clusters; lower = fewer,
+  # broader. ~0.64 suits embeddinggemma book prose.
+  threshold: 0.64
   min_cluster_size: 1
 
 notes:

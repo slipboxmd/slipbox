@@ -2,8 +2,9 @@ import { describe, expect, it } from "vitest";
 import { cluster, type HasVector } from "./cluster.js";
 
 const item = (id: string, vector: number[]): HasVector & { id: string } => ({ id, vector });
+const ids = (clusters: (HasVector & { id: string })[][]) => clusters.map((c) => c.map((x) => x.id).sort());
 
-describe("cluster", () => {
+describe("cluster (average-linkage)", () => {
 	it("returns [] for no items", () => {
 		expect(cluster([], { threshold: 0.6, minSize: 1 })).toEqual([]);
 	});
@@ -18,16 +19,26 @@ describe("cluster", () => {
 		];
 		const clusters = cluster(items, { threshold: 0.9, minSize: 1 });
 		expect(clusters.length).toBe(3);
-		const ids = clusters.map((c) => c.map((x) => (x as { id: string }).id).sort());
-		expect(ids).toContainEqual(["a1", "a2"]);
-		expect(ids).toContainEqual(["b1", "b2"]);
-		expect(ids).toContainEqual(["c1"]);
+		const got = ids(clusters as (HasVector & { id: string })[][]);
+		expect(got).toContainEqual(["a1", "a2"]);
+		expect(got).toContainEqual(["b1", "b2"]);
+		expect(got).toContainEqual(["c1"]);
 	});
 
-	it("is transitive: a~b and b~c chain into one component", () => {
+	it("does NOT chain: a~b and b~c but a≁c stays two clusters (the key fix)", () => {
+		// x·y = 0.8, y·z ≈ 0.75, x·z ≈ 0.2. Single-linkage would merge all three;
+		// average-linkage merges x,y first, then avg(xy,z) ≈ 0.47 < threshold → stop.
 		const items = [item("x", [1, 0]), item("y", [0.8, 0.6]), item("z", [0.2, 0.98])];
-		// x·y and y·z are high, x·z is lower — connected components still merges all three.
 		const clusters = cluster(items, { threshold: 0.7, minSize: 1 });
+		expect(clusters.length).toBe(2);
+		const got = ids(clusters as (HasVector & { id: string })[][]);
+		expect(got).toContainEqual(["x", "y"]);
+		expect(got).toContainEqual(["z"]);
+	});
+
+	it("merges everything at a low enough threshold", () => {
+		const items = [item("x", [1, 0]), item("y", [0.8, 0.6]), item("z", [0.2, 0.98])];
+		const clusters = cluster(items, { threshold: 0.3, minSize: 1 });
 		expect(clusters.length).toBe(1);
 		expect(clusters[0]!.length).toBe(3);
 	});
@@ -36,7 +47,7 @@ describe("cluster", () => {
 		const items = [item("a1", [1, 0]), item("a2", [0.99, 0.01]), item("lonely", [0, 1])];
 		const clusters = cluster(items, { threshold: 0.9, minSize: 2 });
 		expect(clusters.length).toBe(1);
-		expect(clusters[0]!.map((x) => (x as { id: string }).id).sort()).toEqual(["a1", "a2"]);
+		expect((clusters[0] as (HasVector & { id: string })[]).map((x) => x.id).sort()).toEqual(["a1", "a2"]);
 	});
 
 	it("sorts clusters largest-first", () => {
