@@ -62,7 +62,7 @@ const GITIGNORE_BLOCK = `# QMD's derived index (rebuildable cache; the markdown 
 .qmd/*.sqlite-*
 
 # Derived cleaned-text the harness generates for indexing (rebuildable from sources/)
-extracted/
+sources/extracted/
 `;
 
 /**
@@ -77,7 +77,7 @@ export async function scaffoldSlipbox(root: string): Promise<ScaffoldResult> {
 
 	await writeFile(slipboxPath, SLIPBOX_TEMPLATE, "utf8");
 
-	const dirKeys = ["references", "reference_notes", "literature_notes", "permanent_notes", "maps", "sources", "extracted"] as const;
+	const dirKeys = ["references", "literature_notes", "permanent_notes", "maps", "sources", "extracted"] as const;
 	const createdDirs: string[] = [];
 	for (const key of dirKeys) {
 		const rel = DEFAULT_PATHS[key];

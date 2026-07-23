@@ -12,8 +12,9 @@ settings, and house style. Follow the house style.
 
 ## Note types (keep them distinct)
 
-- **Reference** — the source itself + bibliographic metadata. One per source.
-- **Reference note** — a summary of a whole source.
+- **Reference** — one file per source (in `references/`): its bibliographic
+  metadata, a whole-source summary, and links to the literature notes drawn from
+  it. (There is no separate "reference note" file — it's all this one file.)
 - **Literature note** — ONE atomic idea from a source, restated in your own
   words, linked to its reference and supporting chunk(s). Never a dump.
 - **Permanent note** — a refined, self-contained idea connected into the wider
@@ -55,8 +56,9 @@ starting; if not, tell the user how to install them (`slipbox_doctor`).
    `slipbox_autolink` to connect related notes to each other by similarity, across
    ALL sources in the slipbox (not just this one).
 6. **Re-index** so the new notes are searchable (`slipbox_reindex`).
-7. **Write the reference note** — a source-level summary linking to its
-   literature notes.
+7. **Fill in the reference** — `slipbox_write_reference_note` adds the
+   whole-source summary + links to the literature notes onto the one reference
+   file created at ingest (it does not create a second file).
 
 Prefer running the pipeline step-by-step with human review at the seams rather
 than one silent batch. Show what you found before writing many files.

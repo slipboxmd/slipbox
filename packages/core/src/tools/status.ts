@@ -19,7 +19,7 @@ export function registerStatus(pi: ExtensionAPI): void {
 		parameters: Type.Object({}),
 		async execute(_id: string, _params: unknown, _signal: unknown, _onUpdate: unknown, ctx: ExtensionContext) {
 			const config = loadConfig(ctx.cwd);
-			const keys: (keyof SlipboxPaths)[] = ["references", "reference_notes", "literature_notes", "permanent_notes", "maps"];
+			const keys: (keyof SlipboxPaths)[] = ["references", "literature_notes", "permanent_notes", "maps"];
 			const counts = Object.fromEntries(keys.map((k) => [k, countMd(dirFor(config, k))]));
 			const qmdOk = await isAvailable();
 			const indexed = existsSync(qmdDbPath(config.root));
@@ -28,8 +28,7 @@ export function registerStatus(pi: ExtensionAPI): void {
 				`Slipbox root: ${config.root}${config.found ? "" : "  (no .slipbox found — using defaults)"}`,
 				"",
 				"Notes:",
-				`  references:       ${counts.references}`,
-				`  reference-notes:  ${counts.reference_notes}`,
+				`  references:       ${counts.references}  (source records + summaries)`,
 				`  literature-notes: ${counts.literature_notes}`,
 				`  permanent-notes:  ${counts.permanent_notes}`,
 				`  maps:             ${counts.maps}`,

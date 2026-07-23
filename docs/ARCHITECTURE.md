@@ -57,14 +57,19 @@ Search, retrieval, and "find related" throughout Phases 2–5 are just QMD calls
 ```
 <slipbox root>/
   .slipbox                 # our config (see SLIPBOX_SPEC.md)
-  references/              # one file per source + metadata
-  reference-notes/         # source-level summaries
+  references/              # one file per source: metadata + whole-source summary + links to its lit notes
   literature-notes/        # atomic ideas
   permanent-notes/         # refined, networked ideas
   maps/                    # MOCs
-  sources/                 # (optional) cached raw extracted text per source
+  sources/                 # the user's dropped original source files (any format)
+    extracted/             # derived cleaned markdown QMD chunks (gitignored cache)
   .qmd/                    # QMD's project-local index (index.yml + index.sqlite)
 ```
+
+`references/` is the single per-source record — there is no separate
+`reference-notes/` folder. Literature notes link to it via `source:`; the
+reference's link list to its lit notes lives only in frontmatter (`links:`), to
+be rendered from backlinks by the future explorer.
 
 `.qmd/` is QMD's derived cache (gitignore the `.sqlite`; the `.yml` may be
 committed). Our own markdown is the source of truth; QMD's index is rebuildable

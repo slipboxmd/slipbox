@@ -38,7 +38,7 @@ export async function ingestSource(config: SlipboxConfig, sourcePath: string): P
 	const id = makeId(metadata.title, config.notes.id_style);
 
 	const extracted = await writeExtracted(config, id, metadata, markdown);
-	const reference = await writeReference(config, id, metadata, extracted);
+	const reference = await writeReference(config, id, metadata);
 
 	await ensureIndex(config.root, config.qmd.collection);
 	await update(config.root);

@@ -1,14 +1,14 @@
 export type SearchMode = "query" | "vsearch" | "search";
 
 export interface SlipboxPaths {
+	/** One file per source: bibliographic metadata + whole-source summary + links to its literature notes. */
 	references: string;
-	reference_notes: string;
 	literature_notes: string;
 	permanent_notes: string;
 	maps: string;
 	/** Where the user drops original source files (any format). Not touched by the harness. */
 	sources: string;
-	/** Generated cleaned-markdown the harness produces for QMD to chunk. Derived cache. */
+	/** Generated cleaned-markdown the harness produces for QMD to chunk. Derived cache under sources/. */
 	extracted: string;
 	index: string;
 }
@@ -41,11 +41,10 @@ export interface SlipboxConfig {
 
 export const DEFAULT_PATHS: SlipboxPaths = {
 	references: "references/",
-	reference_notes: "reference-notes/",
 	literature_notes: "literature-notes/",
 	permanent_notes: "permanent-notes/",
 	maps: "maps/",
 	sources: "sources/",
-	extracted: "extracted/",
+	extracted: "sources/extracted/",
 	index: ".qmd/",
 };

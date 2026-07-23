@@ -1,7 +1,7 @@
 import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { loadConfig } from "../config/slipbox-config.js";
-import { writeLiterature, writeReferenceNote } from "../notes/write.js";
+import { updateReference, writeLiterature } from "../notes/write.js";
 
 export function registerWrite(pi: ExtensionAPI): void {
 	pi.registerTool({
@@ -48,30 +48,28 @@ export function registerWrite(pi: ExtensionAPI): void {
 		name: "slipbox_write_reference_note",
 		label: "Write reference note",
 		description:
-			"Write the source-level summary (reference note) for an ingested source, linking to the literature notes distilled " +
-			"from it. Call after writing the literature notes.",
-		promptSnippet: "Persist the whole-source summary that ties its literature notes together.",
+			"Add the whole-source summary to the source's reference (the one file created at ingest), and record its literature " +
+			"notes. Updates that reference in place — does not create a second file. Call after writing the literature notes.",
+		promptSnippet: "Fill in the reference's whole-source summary once its literature notes exist.",
 		parameters: Type.Object({
-			reference: Type.String({ description: "Source reference link from ingest, e.g. [[references/<id>]]" }),
-			title: Type.String({ description: "Title for the reference note" }),
+			reference: Type.String({ description: "The reference link from ingest, e.g. [[references/<id>]]" }),
 			summary: Type.String({ description: "A concise summary of the whole source" }),
 			literature_links: Type.Array(Type.String(), { description: "Links to the literature notes, e.g. [[literature-notes/<id>]]" }),
 		}),
 		async execute(
 			_id: string,
-			params: { reference: string; title: string; summary: string; literature_links: string[] },
+			params: { reference: string; summary: string; literature_links: string[] },
 			_signal: unknown,
 			_onUpdate: unknown,
 			ctx: ExtensionContext,
 		) {
 			const config = loadConfig(ctx.cwd);
-			const ref = await writeReferenceNote(config, {
-				referenceLink: params.reference,
-				title: params.title,
+			const ref = await updateReference(config, {
+				reference: params.reference,
 				summary: params.summary,
 				literatureLinks: params.literature_links,
 			});
-			return { content: [{ type: "text", text: `Wrote reference note ${ref.link} → ${ref.relPath}` }], details: ref };
+			return { content: [{ type: "text", text: `Updated reference ${ref.link} with summary + ${params.literature_links.length} links` }], details: ref };
 		},
 	});
 }
