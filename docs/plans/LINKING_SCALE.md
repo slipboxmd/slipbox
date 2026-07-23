@@ -40,3 +40,6 @@ re-embeds a text query (lossy vs the stored note vector).
 Recommendation: ship incremental now (this doc's step 1); build the scoped ANN
 index (step 2, likely Option A) when a slipbox actually reaches tens of thousands
 of notes, or sooner if we want it airtight.
+
+**Decision (2026-07-23): incremental (step 1) is done and deemed good enough for
+now; the ANN index (step 2) is deferred until a slipbox actually gets that large.**
