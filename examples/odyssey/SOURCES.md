@@ -15,14 +15,34 @@ subject [Homer — Translations into English](https://www.gutenberg.org/ebooks/s
 
 Optional further translations (find id on gutenberg.org): George Chapman.
 
-## Commentary / essays (public domain — verify ids on gutenberg.org)
+## Commentary, criticism & studies (confirmed on Gutenberg)
 
-Candidates about Homer / the Odyssey (search Gutenberg by author/title):
+| Work | Author | Gutenberg |
+| --- | --- | --- |
+| Homer's Odyssey: A Commentary | Denton J. Snider | #26275 |
+| The Authoress of the Odyssey | Samuel Butler | #49324 |
+| Homer: The Iliad; The Odyssey (Ancient Classics for English Readers) | W. Lucas Collins | #59306 |
+| Homer and His Age | Andrew Lang | #7972 |
+| The World of Homer | Andrew Lang | #45896 |
+| On Translating Homer (essays) | Matthew Arnold | #65381 |
 
-- Samuel Butler — *The Authoress of the Odyssey*
-- Andrew Lang — *Homer and His Age* / *Homer and the Epic*
-- W. E. Gladstone — *Juventus Mundi: The Gods and Men of the Heroic Age*
-- Jane Ellen Harrison — *Myths of the Odyssey in Art and Literature*
-- John A. Scott — *The Unity of Homer*
+## Retellings / "stories from" (confirmed)
 
-> TODO: confirm the exact Gutenberg ids for the commentary set and add them here.
+| Work | Author | Gutenberg |
+| --- | --- | --- |
+| Stories from the Odyssey | H. L. Havell | #13725 |
+| The Story of the Odyssey | Alfred J. Church | #6370 |
+| The Adventures of Ulysses | Charles Lamb | #7768 |
+| The Adventures of Ulysses the Wanderer | Guy Thorne | #41935 |
+
+## Essay collections that discuss Homer / the Odyssey
+
+| Work | Author | Gutenberg |
+| --- | --- | --- |
+| A Critic in Pall Mall (reviews & essays) | Oscar Wilde | #30191 |
+| National Epics | Kate Milner Rabb | #8072 |
+
+> Still to verify: W. E. Gladstone, *Studies on Homer and the Homeric Age*
+> (multi-volume) — a major Victorian commentary; confirm its Gutenberg ids.
+> Matthew Arnold's *On Translating Homer* (#65381) is the strongest match for the
+> "famous essays about the Odyssey" collection — confirm if that's the one meant.
