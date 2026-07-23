@@ -5,6 +5,30 @@ format, so we can test how the harness performs across formats and share
 runnable demos. Most are **gated on M2 format extractors** (see ROADMAP.md) — the
 example and the extractor get built together, the example acting as the test.
 
+## Source-extraction pattern (all formats)
+
+Every source — whatever its format — follows the same `sources/` → `extracted/`
+shape:
+
+- **`sources/<item>` — one file per source item.** For local files (PDF, txt,
+  epub) it's the original the user drops. For URL-based sources (web page,
+  YouTube video, podcast/RSS episode) the harness *generates* a markdown capture:
+  frontmatter (url, title, date, author) + the content/transcript. Either way this
+  is the human-readable, archival source.
+- **`sources/extracted/<id>.md`** — the cleaned body the harness produces for QMD
+  to chunk (gitignored, rebuildable).
+- **`references/<id>.md`** — metadata + whole-source summary + links (as today).
+
+Per format:
+
+| Format | `sources/<item>` | How extracted |
+| --- | --- | --- |
+| PDF (paper) | `paper.pdf` (dropped) | pdftotext → `extracted/<id>.md` |
+| Web page | `<slug>.md` (generated: url + readable content) | fetch + readability |
+| YouTube video | `<slug>.md` (generated: link + metadata + transcript) | yt-dlp |
+| RSS / podcast / channel | one `<item>.md` per episode/entry (link + transcript) | per-item; the feed is the entry point, each item becomes a source |
+| Book | `book.txt` (dropped) | passthrough + clean (done) |
+
 ## Principles
 
 - **No copyrighted payloads in the repo.** Use public-domain / open sources
@@ -16,6 +40,19 @@ example and the extractor get built together, the example acting as the test.
   explaining the theme, what format it tests, and how to run it.
 - Commit a **small sample of generated notes** in each so people can see good
   output without running it (gitignore the `.qmd` index + `sources/extracted/`).
+
+## Scaffolded examples (in `examples/`)
+
+Each is initialized as a slipbox (`.slipbox` + folders) with a `README.md` (what
+it covers + how it's built) and a `SOURCES.md` (the tracked source list).
+
+| Example | Theme | Format | Status |
+| --- | --- | --- | --- |
+| `classics/` | Christian thought & theology | book `.txt` | to move from `slipbox-test` (8 books + notes) |
+| `odyssey/` | Homer's *Odyssey* — translations + commentary | book `.txt` | **runnable today**; drop the Gutenberg `.txt` in `sources/` |
+| `ai-papers/` | The LLM & AI field — foundational papers | PDF | blocked on PDF extractor (M2) |
+| `tools-for-thought/` | essays on thinking tools / note-taking | web | blocked on web extractor (M2) |
+| `diary-of-a-ceo/` | the whole podcast | RSS / audio | blocked on podcast extractor (M2); large — feed only, transcripts gitignored |
 
 ## Decisions
 

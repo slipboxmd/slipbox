@@ -1,0 +1,6 @@
+# QMD's derived index (rebuildable cache; the markdown is the source of truth)
+.qmd/index.sqlite
+.qmd/*.sqlite-*
+
+# Derived cleaned-text the harness generates for indexing (rebuildable from sources/)
+sources/extracted/
