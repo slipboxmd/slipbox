@@ -14,6 +14,7 @@ import { registerIngest } from "./tools/ingest.js";
 import { registerReadCluster } from "./tools/read-cluster.js";
 import { registerReindex } from "./tools/reindex.js";
 import { registerSearch } from "./tools/search.js";
+import { registerSources } from "./tools/sources.js";
 import { registerStatus } from "./tools/status.js";
 import { registerWrite } from "./tools/write.js";
 
@@ -21,6 +22,7 @@ const HOUSE_STYLE_MARKER = "slipbox:house-style";
 
 export default function slipbox(pi: ExtensionAPI): void {
 	registerDoctor(pi);
+	registerSources(pi);
 	registerIngest(pi);
 	registerReadCluster(pi);
 	registerWrite(pi);

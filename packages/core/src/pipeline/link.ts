@@ -9,8 +9,12 @@ import { parseFrontmatter, stringifyFrontmatter } from "../util/frontmatter.js";
 export interface AutolinkOptions {
 	/** Max related notes to link from each note. */
 	k: number;
-	/** Minimum cosine similarity for a link (note-to-note, normalized). */
+	/** Minimum cosine similarity for a strong link (note-to-note, normalized). */
 	threshold: number;
+	/** Guarantee at least this many links per note (nearest neighbors), so nothing is orphaned. */
+	minLinks: number;
+	/** Never link below this similarity, even to satisfy minLinks. */
+	floor: number;
 }
 
 export interface AutolinkResult {
@@ -74,11 +78,19 @@ export async function autolink(config: SlipboxConfig, opts: AutolinkOptions): Pr
 			sims.push([dot(notes[i]!.vec, notes[j]!.vec), j]);
 		}
 		sims.sort((a, b) => b[0] - a[0]);
-		for (const [s, j] of sims.slice(0, opts.k)) {
+		let added = 0;
+		for (const [s, j] of sims) {
+			if (added >= opts.k) break;
 			if (s >= opts.threshold) {
-				links[i]!.add(j);
-				links[j]!.add(i); // mutual
+				// strong link
+			} else if (added < opts.minLinks && s >= opts.floor) {
+				// top up toward minLinks with the nearest neighbors (so nothing is orphaned)
+			} else {
+				break; // sorted desc: nothing left is worth linking
 			}
+			links[i]!.add(j);
+			links[j]!.add(i); // mutual
+			added++;
 		}
 	}
 

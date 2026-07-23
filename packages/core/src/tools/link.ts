@@ -32,6 +32,8 @@ export function registerAutolink(pi: ExtensionAPI): void {
 			const result = await autolink(config, {
 				k: params.max_per_note ?? 6,
 				threshold: params.threshold ?? 0.55,
+				minLinks: 2,
+				floor: 0.45,
 			});
 
 			const msg =

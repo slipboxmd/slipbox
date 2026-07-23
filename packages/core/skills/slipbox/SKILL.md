@@ -28,11 +28,12 @@ Indexing, embedding, and search are done by **QMD** (an external tool, like
 yt-dlp/ffmpeg). Confirm `qmd` and any needed extraction CLI are installed before
 starting; if not, tell the user how to install them (`slipbox_doctor`).
 
-   **Sources live in the slipbox's `sources/` folder.** To ingest, call
-   `slipbox_ingest` with the filename (it resolves against `sources/`); don't hunt
-   with find/grep. If the file isn't in `sources/`, ask the user to drop it there
-   (or move it there) first. The harness writes its own cleaned copy to
-   `extracted/` — that's derived; never ingest from `extracted/`.
+   **Sources live in the slipbox's `sources/` folder.** To see what's available,
+   call `slipbox_sources` (it lists each file with its title) — don't hunt with
+   find/grep or read files to identify them. Then call `slipbox_ingest` with the
+   filename. If the source isn't in `sources/`, ask the user to drop it there. The
+   harness writes its own cleaned copy under `sources/extracted/` — that's
+   derived; never ingest from there.
 
 1. **Extract** — `slipbox_ingest` extracts the source, strips boilerplate, and
    writes a cleaned copy to `extracted/` for QMD. The user's original in
