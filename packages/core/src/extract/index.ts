@@ -22,7 +22,13 @@ export async function extract(source: string): Promise<Extracted> {
 	if (!extractor) throw new UnsupportedSourceError(source);
 	const result = await extractor.extract(source);
 	const cleaned = cleanSourceText(result.markdown);
-	return { ...result, markdown: cleaned.text };
+	// Prefer a real title/author lifted from the source header over the filename fallback.
+	const metadata = {
+		...result.metadata,
+		title: cleaned.meta.title || result.metadata.title,
+		...(cleaned.meta.author ? { author: cleaned.meta.author } : {}),
+	};
+	return { markdown: cleaned.text, metadata };
 }
 
 export type { Extracted, Extractor } from "./types.js";

@@ -6,7 +6,10 @@ export interface SlipboxPaths {
 	literature_notes: string;
 	permanent_notes: string;
 	maps: string;
+	/** Where the user drops original source files (any format). Not touched by the harness. */
 	sources: string;
+	/** Generated cleaned-markdown the harness produces for QMD to chunk. Derived cache. */
+	extracted: string;
 	index: string;
 }
 
@@ -43,5 +46,6 @@ export const DEFAULT_PATHS: SlipboxPaths = {
 	permanent_notes: "permanent-notes/",
 	maps: "maps/",
 	sources: "sources/",
+	extracted: "extracted/",
 	index: ".qmd/",
 };

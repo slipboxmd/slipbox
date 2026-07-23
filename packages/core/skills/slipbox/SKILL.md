@@ -27,9 +27,15 @@ Indexing, embedding, and search are done by **QMD** (an external tool, like
 yt-dlp/ffmpeg). Confirm `qmd` and any needed extraction CLI are installed before
 starting; if not, tell the user how to install them (`slipbox_doctor`).
 
-1. **Extract** the source to markdown + metadata (title, author, date) using the
-   right CLI for its format (pandoc, yt-dlp, whisper, …). Write it into the
-   slipbox as a reference.
+   **Sources live in the slipbox's `sources/` folder.** To ingest, call
+   `slipbox_ingest` with the filename (it resolves against `sources/`); don't hunt
+   with find/grep. If the file isn't in `sources/`, ask the user to drop it there
+   (or move it there) first. The harness writes its own cleaned copy to
+   `extracted/` — that's derived; never ingest from `extracted/`.
+
+1. **Extract** — `slipbox_ingest` extracts the source, strips boilerplate, and
+   writes a cleaned copy to `extracted/` for QMD. The user's original in
+   `sources/` is left untouched.
 2. **Index + embed** via QMD (`qmd update` + `qmd embed`) — QMD chunks and
    embeds; do not build your own chunker/embedder.
 3. **Cluster** the chunk vectors by similarity — each cluster of related

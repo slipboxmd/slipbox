@@ -1,7 +1,7 @@
 import type { SlipboxConfig } from "../config/types.js";
 import { extract } from "../extract/index.js";
 import { makeId } from "../notes/ids.js";
-import { writeReference, writeSource, type NoteRef } from "../notes/write.js";
+import { writeExtracted, writeReference, type NoteRef } from "../notes/write.js";
 import { embed, ensureIndex, qmdDbPath, update } from "../qmd/cli.js";
 import { readChunks } from "../qmd/vectors.js";
 import { cluster } from "./cluster.js";
@@ -18,7 +18,8 @@ export interface IngestCluster {
 
 export interface IngestResult {
 	reference: NoteRef;
-	source: NoteRef;
+	/** The generated cleaned-text doc QMD chunked (in extracted/). */
+	extracted: NoteRef;
 	title: string;
 	totalChunks: number;
 	clusters: IngestCluster[];
@@ -36,14 +37,14 @@ export async function ingestSource(config: SlipboxConfig, sourcePath: string): P
 	const { markdown, metadata } = await extract(sourcePath);
 	const id = makeId(metadata.title, config.notes.id_style);
 
-	const source = await writeSource(config, id, metadata, markdown);
-	const reference = await writeReference(config, id, metadata, source);
+	const extracted = await writeExtracted(config, id, metadata, markdown);
+	const reference = await writeReference(config, id, metadata, extracted);
 
 	await ensureIndex(config.root, config.qmd.collection);
 	await update(config.root);
 	await embed(config.root);
 
-	const chunks = await readChunks(qmdDbPath(config.root), source.relPath);
+	const chunks = await readChunks(qmdDbPath(config.root), extracted.relPath);
 
 	const groups = cluster(chunks, {
 		threshold: config.clustering.threshold,
@@ -59,5 +60,5 @@ export async function ingestSource(config: SlipboxConfig, sourcePath: string): P
 			.map((c) => (c.text.length > EXCERPT_CHARS ? `${c.text.slice(0, EXCERPT_CHARS)}…` : c.text)),
 	}));
 
-	return { reference, source, title: metadata.title, totalChunks: chunks.length, clusters };
+	return { reference, extracted, title: metadata.title, totalChunks: chunks.length, clusters };
 }

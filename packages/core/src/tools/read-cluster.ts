@@ -25,7 +25,7 @@ export function registerReadCluster(pi: ExtensionAPI): void {
 			const config = loadConfig(ctx.cwd);
 			const id = params.source.replace(/\[\[|\]\]/g, "").trim().split("/").pop()?.replace(/\.md$/, "") ?? params.source;
 
-			const chunks = (await readChunks(qmdDbPath(config.root), id)).filter((c) => c.path.includes("sources/"));
+			const chunks = (await readChunks(qmdDbPath(config.root), id)).filter((c) => c.path.includes("extracted/"));
 			const bySeq = new Map(chunks.map((c) => [c.seq, c.text]));
 
 			const passages = params.seqs.map((s) => bySeq.get(s)).filter((t): t is string => Boolean(t));

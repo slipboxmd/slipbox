@@ -43,8 +43,15 @@ Instructions the agent should follow when writing notes for THIS slipbox.
   **quote the author's own words** where they capture it best (weave quotes into
   the prose — not a bare list). Be explanatory and self-contained: a reader should
   grasp the idea, and how the author argues it, without opening the source.
-- One idea per note — if a cluster really holds two ideas, make two notes. Don't
-  pad, and don't shrink a rich passage to a single sentence.
+- **Let length follow the material.** A cluster drawn from many passages, or one
+  spanning several facets of an idea, deserves a fuller note (several paragraphs);
+  a slim cluster a shorter one. Don't inflate or compress to hit a size.
+- **Write like a person, not an AI.** Plain, direct prose. Avoid the tells: no
+  "isn't just X, it's Y", no tidy rule-of-three lists, use em-dashes sparingly, no
+  "In conclusion / Overall / It's worth noting" filler, and no abstractions that
+  stand in for the author's concrete claims. Vary sentence length; prefer
+  specifics and the author's own words over smooth summary.
+- One idea per note — if a cluster really holds two ideas, make two notes.
 - Tag with lowercase, hyphenated topics.
 - Link each note back to its source reference. (Links between notes are added
   after all the notes exist.)
@@ -53,6 +60,9 @@ Instructions the agent should follow when writing notes for THIS slipbox.
 const GITIGNORE_BLOCK = `# QMD's derived index (rebuildable cache; the markdown is the source of truth)
 .qmd/index.sqlite
 .qmd/*.sqlite-*
+
+# Derived cleaned-text the harness generates for indexing (rebuildable from sources/)
+extracted/
 `;
 
 /**
@@ -67,7 +77,7 @@ export async function scaffoldSlipbox(root: string): Promise<ScaffoldResult> {
 
 	await writeFile(slipboxPath, SLIPBOX_TEMPLATE, "utf8");
 
-	const dirKeys = ["references", "reference_notes", "literature_notes", "permanent_notes", "maps", "sources"] as const;
+	const dirKeys = ["references", "reference_notes", "literature_notes", "permanent_notes", "maps", "sources", "extracted"] as const;
 	const createdDirs: string[] = [];
 	for (const key of dirKeys) {
 		const rel = DEFAULT_PATHS[key];

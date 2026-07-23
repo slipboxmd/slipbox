@@ -30,12 +30,13 @@ async function persist(config: SlipboxConfig, absDir: string, id: string, data: 
 }
 
 /**
- * Write the full extracted source text to `sources/` — this is what QMD chunks +
- * clusters, so it is written as RAW markdown (no frontmatter) to keep chunk text
- * clean. Provenance lives in the matching `references/` record.
+ * Write the cleaned, extracted source text to `extracted/` — this is what QMD
+ * chunks + clusters, so it is RAW markdown (no frontmatter) to keep chunk text
+ * clean. The user's original file stays untouched in `sources/`; provenance is
+ * recorded in the matching `references/` record.
  */
-export async function writeSource(config: SlipboxConfig, id: string, _meta: SourceMeta, markdown: string): Promise<NoteRef> {
-	const absDir = dirFor(config, "sources");
+export async function writeExtracted(config: SlipboxConfig, id: string, _meta: SourceMeta, markdown: string): Promise<NoteRef> {
+	const absDir = dirFor(config, "extracted");
 	await mkdir(absDir, { recursive: true });
 	const path = join(absDir, `${id}.md`);
 	await writeFile(path, markdown.endsWith("\n") ? markdown : `${markdown}\n`, "utf8");
