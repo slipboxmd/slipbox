@@ -17,6 +17,36 @@ example and the extractor get built together, the example acting as the test.
 - Commit a **small sample of generated notes** in each so people can see good
   output without running it (gitignore the `.qmd` index + `sources/extracted/`).
 
+## Decisions
+
+- **`classics/` ships the full slipbox** — all 8 Gutenberg books + every generated
+  note (move `slipbox-test` here when the batch finishes). ~5 MB; gitignore the
+  `.qmd` index + `sources/extracted/`.
+- **Build formats later** — we're picking themes/sources first, then building the
+  extractor + its example together.
+
+## Concrete theme + source proposals (to confirm together)
+
+Each example wants ONE coherent theme so clustering + cross-note links are
+meaningful. Proposals — swap freely:
+
+- **`classics/`** — *Christian thought & theology* (already running):
+  Augustine's *Confessions* + *City of God*, Talmage *Jesus the Christ*, *Life of
+  St. Francis*, Chesterton *The Man Who Was Thursday*, Maclaren *Expositions of
+  Holy Scripture*, Besant *Esoteric Christianity*, Gibbons *The Faith of Our
+  Fathers*. (Gutenberg, public domain.)
+- **`papers/` (PDF)** — *LLM agents & retrieval*: a handful of open arXiv papers
+  (e.g. Attention Is All You Need, ReAct, RAG, Toolformer, a survey). Relevant +
+  coherent + openly downloadable.
+- **`reading-list/` (web)** — *tools for thought / note-taking*: essays from
+  gwern, Andy Matuschak, Sönke Ahrens-adjacent pieces, Maggie Appleton, etc.
+  (meta and fitting for a slipbox). Alt: Paul Graham essays (clean, coherent).
+- **`feed/` (RSS)** — one active tech/thinking blog's feed, e.g. Simon Willison
+  (simonwillison.net — great feed, LLM/tools focus).
+- **`podcast/` (YouTube)** — 2-3 episodes of one AI podcast with good transcripts
+  (e.g. Dwarkesh Patel or Latent Space) on a shared theme.
+- **`talks/` (audio)** — defer (highest effort); a public/CC lecture later.
+
 ## Proposed set
 
 | Example | Format | Sources | Tests | Needs |
