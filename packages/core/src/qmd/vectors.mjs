@@ -31,6 +31,8 @@ const vecSelect = withVectors ? ", vec_to_json(v.embedding) AS vec" : "";
 const vecJoin = withVectors ? "JOIN vectors_vec v ON (cv.hash || '_' || cv.seq) = v.hash_seq" : "";
 const where = pathFilter ? "WHERE d.active = 1 AND d.path LIKE ?" : "WHERE d.active = 1";
 
+// Chunk metadata only — do NOT select c.doc here, or the full document text is
+// duplicated onto every chunk row (megabytes × chunks → heap blowup on a corpus).
 const rows = db
 	.prepare(
 		`SELECT cv.hash          AS hash,
@@ -38,16 +40,21 @@ const rows = db
 		        cv.pos           AS pos,
 		        cv.total_chunks  AS totalChunks,
 		        d.path           AS path,
-		        d.title          AS title,
-		        c.doc            AS doc${vecSelect}
+		        d.title          AS title${vecSelect}
 		 FROM content_vectors cv
 		 JOIN documents d ON d.hash = cv.hash
-		 JOIN content c ON c.hash = cv.hash
 		 ${vecJoin}
 		 ${where}
 		 ORDER BY d.path, cv.seq`,
 	)
 	.all(...(pathFilter ? [`%${pathFilter}%`] : []));
+
+// Fetch each document's text exactly once (keyed by content hash).
+const docStmt = db.prepare("SELECT doc FROM content WHERE hash = ?");
+const docByHash = new Map();
+for (const r of rows) {
+	if (!docByHash.has(r.hash)) docByHash.set(r.hash, String(docStmt.get(r.hash)?.doc ?? ""));
+}
 
 // Group by document to slice per-chunk text via pos offsets.
 const byDoc = new Map();
@@ -59,11 +66,12 @@ for (const r of rows) {
 const out = [];
 for (const [, chunks] of byDoc) {
 	chunks.sort((a, b) => a.seq - b.seq);
+	const doc = docByHash.get(chunks[0].hash) ?? "";
 	for (let i = 0; i < chunks.length; i++) {
 		const r = chunks[i];
 		const start = r.pos;
-		const end = i + 1 < chunks.length ? chunks[i + 1].pos : r.doc.length;
-		const text = String(r.doc).slice(start, end).replace(/\s+/g, " ").trim();
+		const end = i + 1 < chunks.length ? chunks[i + 1].pos : doc.length;
+		const text = doc.slice(start, end).replace(/\s+/g, " ").trim();
 		out.push({
 			id: `${r.hash}_${r.seq}`,
 			path: r.path,

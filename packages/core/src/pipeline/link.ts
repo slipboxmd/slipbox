@@ -55,8 +55,10 @@ function wikilink(config: SlipboxConfig, relPath: string): string {
 export async function autolink(config: SlipboxConfig, opts: AutolinkOptions): Promise<AutolinkResult> {
 	const litRel = config.paths.literature_notes.replace(/\/$/, "");
 
-	// One averaged vector per literature note (a note may be >1 chunk).
-	const chunks = (await readChunks(qmdDbPath(config.root))).filter((c) => c.path.includes(`${litRel}/`));
+	// One averaged vector per literature note (a note may be >1 chunk). Filter to
+	// literature notes IN THE QUERY — reading every source's chunk vectors would
+	// blow the heap on a multi-book corpus.
+	const chunks = (await readChunks(qmdDbPath(config.root), litRel)).filter((c) => c.path.includes(`${litRel}/`));
 	const byNote = new Map<string, number[][]>();
 	for (const c of chunks) {
 		if (!byNote.has(c.path)) byNote.set(c.path, []);
