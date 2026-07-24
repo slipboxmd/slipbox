@@ -15,7 +15,7 @@ See [SOURCES.md](SOURCES.md) for the full categorized list with arXiv ids.
 
 ## Corpus (git submodule)
 
-The PDFs live in [slipboxmd/examples-ai](https://github.com/slipboxmd/examples-ai),
+The PDFs live in [slipboxmd/example-ai](https://github.com/slipboxmd/example-ai),
 mounted here at `sources/`. Get them with:
 
 ```bash

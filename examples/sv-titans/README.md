@@ -16,7 +16,7 @@ keep/cut rubric.
 ## Layout
 
 - `sources/` — the raw source texts, one folder per author (git submodule:
-  [`slipboxmd/examples-sv-titans`](https://github.com/slipboxmd/examples-sv-titans)).
+  [`slipboxmd/example-sv-titans`](https://github.com/slipboxmd/example-sv-titans)).
 - The generated slipbox (references, literature notes, links) lives alongside once
   the pipeline has been run over the sources.
 

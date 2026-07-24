@@ -15,15 +15,15 @@ ingests any source format (file or URL) and produces a linked note network:
 - URL sources pin a **Wayback snapshot** (`archived`/`archived_date`)
 - **One-shot mode**: `slipbox --yolo` (or `slipbox_ingest(yolo: true)`) runs the
   pipeline through without pausing; default is review-at-the-seams
-- Example corpus repos are standardized on `examples-*`
+- Example corpus repos are standardized on `example-*`
 
 **Phase 2 (the localhost explorer) is next** and hasn't been started.
 
 ## Regenerating local corpus files
 
-The odyssey and ai corpora are submodules (`git submodule update --init`). The
-sv-titans sources are git-ignored; rebuild what's been acquired with
-[`fetch/README.md`](./fetch/README.md):
+All three corpora are git submodules — `git submodule update --init --recursive`
+pulls them down. The scripts in [`fetch/`](./fetch/README.md) are what *built* the
+sv-titans corpus; use them to add more authors, not to restore it:
 
 ```
 pip3 install --user trafilatura && export PATH="$HOME/.local/bin:$PATH"
@@ -47,8 +47,7 @@ whisper. Run `slipbox_doctor` for an inventory. Full table in `docs/FORMATS.md`.
       Graham (173 essays), Naval, pmarca, Bezos letters, Sam Altman (7). The rest
       need hand-picked best-of selections; Thiel's CS183 and 37signals' *Getting
       Real* need non-JS mirrors. Status table in `examples/sv-titans/SOURCES.md`.
-- [ ] sv-titans: create the `slipboxmd/examples-sv-titans` repo + submodule, then
-      run the pipeline over the corpus to generate its notes.
+- [ ] sv-titans: run the pipeline over the corpus to generate its notes.
 - [ ] Sam Altman's Startup Playbook (multi-page JS site) still to pull.
 
 ## Project memory

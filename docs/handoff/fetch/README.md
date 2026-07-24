@@ -1,9 +1,14 @@
 # Regenerating the sv-titans local sources
 
-The raw source texts under `examples/sv-titans/sources/` are **git-ignored** (kept
-out of the public `slipboxmd/slipbox` history; they'll live in the
-`slipboxmd/examples-sv-titans` submodule once complete). So on a fresh checkout,
-`sources/` is empty — regenerate the already-acquired 5 authors with these scripts.
+The raw source texts under `examples/sv-titans/sources/` live in the
+[`slipboxmd/example-sv-titans`](https://github.com/slipboxmd/example-sv-titans)
+submodule, so a fresh checkout gets them via
+`git submodule update --init --recursive` — you do **not** need these scripts to
+restore the corpus.
+
+They're kept as the record of how it was built, and to re-run when adding authors.
+After fetching new material, commit + push inside `examples/sv-titans/sources/`
+(it's its own repo), then commit the updated submodule pointer in the parent.
 
 ## Prereq
 

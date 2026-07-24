@@ -6,7 +6,7 @@ its origin URL in its frontmatter. The only original works of this corpus's
 maintainers are the slipbox notes derived from these sources.
 
 If you are a rights holder and wish your material removed, please open an issue on
-[`slipboxmd/examples-sv-titans`](https://github.com/slipboxmd/examples-sv-titans).
+[`slipboxmd/example-sv-titans`](https://github.com/slipboxmd/example-sv-titans).
 
 ## Per-author sources
 

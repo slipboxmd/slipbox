@@ -75,11 +75,11 @@ non-fatal; see `docs/FORMATS.md`.
 
 ## Example corpora
 
-Repos live in the `slipboxmd` org, all prefixed `examples-*`, mounted as submodules
+Repos live in the `slipboxmd` org, all prefixed `example-*`, mounted as submodules
 under `examples/<name>/sources`:
 
 | Example | Repo | State |
 | --- | --- | --- |
-| odyssey | `examples-odyssey` | ✅ corpus complete (public-domain scholarship) |
-| ai | `examples-ai` | ✅ 40-paper corpus |
-| sv-titans | `examples-sv-titans` | ◑ 5 of ~14 authors acquired; repo not created yet |
+| odyssey | `example-odyssey` | ✅ corpus complete (public-domain scholarship) |
+| ai | `example-ai` | ✅ 40-paper corpus |
+| sv-titans | `example-sv-titans` | ◑ 5 of ~14 authors acquired (182 files); 9 authors to go |
