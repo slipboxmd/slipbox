@@ -75,8 +75,9 @@ non-fatal; see `docs/FORMATS.md`.
 
 ## Example corpora
 
-Repos live in the `slipboxmd` org, all prefixed `example-*`, mounted as submodules
-under `examples/<name>/sources`:
+Each example is its own repo in the `slipboxmd` org (`example-*`), mounted as a
+submodule at `examples/<name>`. The repo is a complete, runnable slipbox (config +
+sources + notes):
 
 | Example | Repo | State |
 | --- | --- | --- |

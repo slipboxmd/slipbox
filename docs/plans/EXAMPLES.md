@@ -46,9 +46,11 @@ Per format:
 Each is initialized as a slipbox (`.slipbox` + folders) with a `README.md` (what
 it covers + how it's built) and a `SOURCES.md` (the tracked source list).
 
-Corpus repos live in the `slipboxmd` org, all prefixed `example-*`, and are
-mounted as git submodules at `examples/<name>/sources` so large source texts stay
-out of the harness repo's history.
+Each example lives in its **own repo** in the `slipboxmd` org (`example-*`) and is
+mounted as a git submodule at `examples/<name>`. The repo *is* the slipbox — its
+`.slipbox` config, `sources/`, and generated notes all travel together, so anyone
+can clone just that example and run `slipbox` in it. It also keeps multi-MB source
+texts out of the harness repo's history.
 
 | Example | Theme | Format | Status |
 | --- | --- | --- | --- |

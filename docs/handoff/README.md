@@ -21,9 +21,10 @@ ingests any source format (file or URL) and produces a linked note network:
 
 ## Regenerating local corpus files
 
-All three corpora are git submodules — `git submodule update --init --recursive`
-pulls them down. The scripts in [`fetch/`](./fetch/README.md) are what *built* the
-sv-titans corpus; use them to add more authors, not to restore it:
+Each example is a submodule at `examples/<name>` — `git submodule update --init
+--recursive` pulls them down, each a complete runnable slipbox. The scripts in
+[`fetch/`](./fetch/README.md) are what *built* the sv-titans corpus; use them to
+add more authors, not to restore it:
 
 ```
 pip3 install --user trafilatura && export PATH="$HOME/.local/bin:$PATH"

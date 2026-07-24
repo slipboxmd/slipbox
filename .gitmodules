@@ -1,9 +1,9 @@
-[submodule "examples/odyssey/sources"]
-	path = examples/odyssey/sources
+[submodule "examples/odyssey"]
+	path = examples/odyssey
 	url = https://github.com/slipboxmd/example-odyssey.git
-[submodule "examples/ai/sources"]
-	path = examples/ai/sources
+[submodule "examples/ai"]
+	path = examples/ai
 	url = https://github.com/slipboxmd/example-ai.git
-[submodule "examples/sv-titans/sources"]
-	path = examples/sv-titans/sources
+[submodule "examples/sv-titans"]
+	path = examples/sv-titans
 	url = https://github.com/slipboxmd/example-sv-titans.git

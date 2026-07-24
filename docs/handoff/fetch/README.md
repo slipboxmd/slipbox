@@ -7,8 +7,8 @@ submodule, so a fresh checkout gets them via
 restore the corpus.
 
 They're kept as the record of how it was built, and to re-run when adding authors.
-After fetching new material, commit + push inside `examples/sv-titans/sources/`
-(it's its own repo), then commit the updated submodule pointer in the parent.
+After fetching new material, commit + push inside `examples/sv-titans/` (it's its
+own repo), then commit the updated submodule pointer in the parent.
 
 ## Prereq
 
