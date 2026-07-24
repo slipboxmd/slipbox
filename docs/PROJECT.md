@@ -24,8 +24,10 @@ metadata before the pipeline runs:
 
 ## Note types
 
-- **Reference** — the ingested source + bibliographic metadata.
-- **Reference note** — a source-level summary (the whole book/article).
+- **Reference** — one file per source: bibliographic metadata, the whole-source
+  summary, and links to the literature notes drawn from it. *(As built, this
+  absorbed the originally-planned separate "reference note" — metadata and summary
+  live in the same file.)*
 - **Literature note** — one atomic idea from a source, in your own words,
   linked back to the reference and the supporting chunk(s).
 - **Permanent note** — a refined, self-contained idea woven into the network.

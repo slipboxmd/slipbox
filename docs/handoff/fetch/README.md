@@ -2,7 +2,7 @@
 
 The raw source texts under `examples/sv-titans/sources/` are **git-ignored** (kept
 out of the public `slipboxmd/slipbox` history; they'll live in the
-`slipboxmd/example-sv-titans` submodule once complete). So on a fresh checkout,
+`slipboxmd/examples-sv-titans` submodule once complete). So on a fresh checkout,
 `sources/` is empty — regenerate the already-acquired 5 authors with these scripts.
 
 ## Prereq

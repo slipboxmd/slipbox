@@ -40,10 +40,11 @@ QMD itself (always required): `npm i -g @tobilu/qmd` (macOS also `brew install s
   auto-captions, converted from VTT and de-duplicated). No captions → falls back
   to the video description. Only English tracks are requested (a broad match trips
   YouTube's rate limiter).
-- **Audio (whisper)** — local transcription with the `base.en` model; slow on long
-  files (no GPU needed, but minutes per hour of audio). `ffmpeg` is used by whisper
-  for decoding. *Documented but not yet exercised on this machine — whisper wasn't
-  installed at build time; verify on first real use.*
+- **Audio (whisper)** — local transcription with the `base.en` model; `ffmpeg` does
+  the decoding. Measured: a 60-second clip transcribed accurately in ~16s on CPU, so
+  budget roughly a quarter of real-time (a 1-hour podcast ≈ 15 min). Whisper emits
+  one line per speech segment; the extractor joins them into flowing prose so QMD
+  chunks on sentences rather than on segments.
 - **Feeds** — `slipbox_feed(url)` parses RSS 2.0 and Atom natively (no dep) and
   lists items; you ingest chosen items by their links. A podcast feed's audio
   enclosures would be ingested as audio files (download first).
@@ -56,11 +57,34 @@ markdown — as the archival source of record. The cleaned body still goes to
 `sources/extracted/<id>.md` for QMD, and provenance is also on the `references/`
 record.
 
-> **Known first-pass issue (to resolve together):** the QMD collection is rooted
-> at the slipbox (`.`, pattern `**/*.md`), so a URL capture in `sources/` is
-> indexed *in addition to* its `sources/extracted/` copy — harmless for
-> clustering / read-cluster / autolink (those filter to `extracted/` or
-> `literature-notes/`), but it double-counts in `slipbox_search`. Fix options:
-> scope the collection to the content dirs (QMD spans multiple named collections)
-> or relocate captures. Deferred because it touches the locked single-collection
-> index design.
+> **Known issue:** the QMD collection is rooted at the slipbox (`.`, pattern
+> `**/*.md`), so a URL capture in `sources/` is indexed *in addition to* its
+> `sources/extracted/` copy — harmless for clustering / read-cluster / autolink
+> (those filter to `extracted/` or `literature-notes/`), but it double-counts in
+> `slipbox_search`. Fix options: scope the collection to the content dirs (QMD
+> spans multiple named collections) or relocate captures. Deferred because it
+> touches the locked single-collection index design.
+
+## Wayback archiving (URL sources)
+
+A web page can change or disappear after you take notes from it, so on URL ingest
+the harness pins a **Wayback Machine snapshot**. The reference and capture record
+both the live URL and the archived one:
+
+```yaml
+origin: https://www.paulgraham.com/ds.html
+archived: https://web.archive.org/web/20260724151219/https://www.paulgraham.com/ds.html
+archived_date: 2026-07-24
+```
+
+Two calls, both best-effort and **non-fatal** — offline, rate-limited, or blocked
+all degrade to "no archive link" rather than failing the ingest:
+
+1. **Save Page Now** — asks Wayback to capture the page now. Fire-and-forget: SPN
+   routinely takes minutes, far too long to block ingestion on.
+2. **Availability API** — a fast lookup of the closest existing snapshot, which is
+   what actually gets recorded.
+
+Consequence worth knowing: for a page Wayback has **never** seen, the first ingest
+records no snapshot (the save we just triggered hasn't finished). Re-ingesting, or
+re-running later, picks it up. Nothing else in the pipeline depends on these fields.

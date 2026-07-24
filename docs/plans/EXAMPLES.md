@@ -46,21 +46,30 @@ Per format:
 Each is initialized as a slipbox (`.slipbox` + folders) with a `README.md` (what
 it covers + how it's built) and a `SOURCES.md` (the tracked source list).
 
+Corpus repos live in the `slipboxmd` org, all prefixed `examples-*`, and are
+mounted as git submodules at `examples/<name>/sources` so large source texts stay
+out of the harness repo's history.
+
 | Example | Theme | Format | Status |
 | --- | --- | --- | --- |
+| `odyssey/` | Homer's *Odyssey* — translations + commentary | book `.txt` | ✅ corpus complete (`examples-odyssey`) |
+| `ai/` | The LLM & AI field — foundational papers | PDF | ✅ 40-paper corpus (`examples-ai`) |
+| `sv-titans/` | Founder-essayists on building startups | web + PDF | ◑ 5 of ~14 authors acquired; repo not created yet |
 | `classics/` | Christian thought & theology | book `.txt` | to move from `slipbox-test` (8 books + notes) |
-| `odyssey/` | Homer's *Odyssey* — translations + commentary | book `.txt` | **runnable today**; drop the Gutenberg `.txt` in `sources/` |
-| `ai-papers/` | The LLM & AI field — foundational papers | PDF | blocked on PDF extractor (M2) |
-| `tools-for-thought/` | essays on thinking tools / note-taking | web | blocked on web extractor (M2) |
-| `diary-of-a-ceo/` | the whole podcast | RSS / audio | blocked on podcast extractor (M2); large — feed only, transcripts gitignored |
+| `tools-for-thought/` | essays on thinking tools / note-taking | web | not started (extractor ready) |
+| `diary-of-a-ceo/` | the whole podcast | RSS / audio | not started (extractors ready); large — feed only, transcripts gitignored |
+
+All M2 extractors now exist, so no example is blocked on format support.
 
 ## Decisions
 
 - **`classics/` ships the full slipbox** — all 8 Gutenberg books + every generated
   note (move `slipbox-test` here when the batch finishes). ~5 MB; gitignore the
   `.qmd` index + `sources/extracted/`.
-- **Build formats later** — we're picking themes/sources first, then building the
-  extractor + its example together.
+- **Build formats later** — we picked themes/sources first, then built the
+  extractor + its example together. *(Done: all M2 formats shipped 2026-07-24.)*
+- **Corpora live in their own repos** (`slipboxmd/examples-*`) as submodules, so
+  multi-MB source texts never enter the harness repo's history.
 
 ## Concrete theme + source proposals (to confirm together)
 
