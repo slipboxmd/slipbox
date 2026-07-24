@@ -1,4 +1,5 @@
 import type { SlipboxConfig } from "../config/types.js";
+import { archiveUrl } from "../extract/archive.js";
 import { extract, isUrl } from "../extract/index.js";
 import { makeId } from "../notes/ids.js";
 import { writeExtracted, writeReference, writeSourceCapture, type NoteRef } from "../notes/write.js";
@@ -37,9 +38,17 @@ export async function ingestSource(config: SlipboxConfig, sourcePath: string): P
 	const { markdown, metadata } = await extract(sourcePath);
 	const id = makeId(metadata.title, config.notes.id_style);
 
-	// URL sources have no local original — archive the fetched markdown as the
-	// source of record in sources/. Dropped files already live there.
-	if (isUrl(sourcePath)) await writeSourceCapture(config, id, metadata, markdown);
+	if (isUrl(sourcePath)) {
+		// Pin a Wayback snapshot so the note survives the page changing (best-effort).
+		const snapshot = await archiveUrl(sourcePath);
+		if (snapshot) {
+			metadata.archived = snapshot.url;
+			if (snapshot.date) metadata.archived_date = snapshot.date;
+		}
+		// URL sources have no local original — archive the fetched markdown as the
+		// source of record in sources/. Dropped files already live there.
+		await writeSourceCapture(config, id, metadata, markdown);
+	}
 
 	const extracted = await writeExtracted(config, id, metadata, markdown);
 	const reference = await writeReference(config, id, metadata);

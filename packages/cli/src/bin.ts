@@ -16,10 +16,12 @@ if (args.includes("--help") || args.includes("-h")) {
 			"",
 			"Usage:",
 			"  slipbox            Open the harness in the current folder",
+			"  slipbox --yolo     One-shot: ingest runs straight through without pausing",
+			"                     for review (all notes → autolink → reference note)",
 			"",
 			"Inside the harness:",
 			"  /init              Scaffold this folder into a slipbox",
-			'  ingest <file>      Bring a source in and cluster its ideas',
+			"  ingest <file|url>  Bring a source in and cluster its ideas",
 			"  /login             Authenticate (reuses your Pi login if present)",
 			"",
 			"Requires QMD (npm i -g @tobilu/qmd; qmd pull) and a Pi login.",
@@ -27,6 +29,9 @@ if (args.includes("--help") || args.includes("-h")) {
 	);
 	process.exit(0);
 }
+
+// One-shot mode: the extension reads this when deciding how to pace ingestion.
+if (args.includes("--yolo")) process.env.SLIPBOX_YOLO = "1";
 
 // Defer the heavy Pi SDK import until we actually launch.
 const { launch } = await import("./launch.js");

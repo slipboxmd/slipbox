@@ -60,6 +60,8 @@ export async function writeSourceCapture(config: SlipboxConfig, id: string, meta
 	const data: Record<string, unknown> = { id, type: "source", title: meta.title, kind: meta.kind, origin: meta.origin, captured: today() };
 	if (meta.author) data.author = meta.author;
 	if (meta.date) data.date = meta.date;
+	if (meta.archived) data.archived = meta.archived;
+	if (meta.archived_date) data.archived_date = meta.archived_date;
 	await writeFile(path, stringifyFrontmatter(data, markdown), "utf8");
 	const relPath = relative(config.root, path);
 	return { id, path, relPath, link: linkFor(config, relPath.replace(/\.md$/, ""), meta.title) };
@@ -81,6 +83,9 @@ export async function writeReference(config: SlipboxConfig, id: string, meta: So
 	};
 	if (meta.author) data.author = meta.author;
 	if (meta.date) data.date = meta.date;
+	// A web source can change or disappear; the Wayback snapshot pins what we read.
+	if (meta.archived) data.archived = meta.archived;
+	if (meta.archived_date) data.archived_date = meta.archived_date;
 	return persist(config, dirFor(config, "references"), id, data, `# ${meta.title}\n`);
 }
 

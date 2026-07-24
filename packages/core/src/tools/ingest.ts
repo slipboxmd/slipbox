@@ -4,6 +4,7 @@ import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { dirFor, loadConfig } from "../config/slipbox-config.js";
 import type { SlipboxConfig } from "../config/types.js";
+import { yoloDefault } from "../env/mode.js";
 import { isUrl } from "../extract/index.js";
 import { ingestSource } from "../pipeline/ingest.js";
 import { isAvailable } from "../qmd/cli.js";
@@ -42,9 +43,16 @@ export function registerIngest(pi: ExtensionAPI): void {
 				"(.txt/.md, .pdf, .epub/.docx/.html, or audio) OR an https:// URL (web article or YouTube video).",
 		promptSnippet: "Bring a new source (from sources/) into the slipbox and get idea clusters.",
 		parameters: Type.Object({
-			source: Type.String({ description: "Source filename in sources/ (e.g. confessions.txt), or a path to the file" }),
+			source: Type.String({ description: "Source filename in sources/ (e.g. confessions.txt), a path to a file, or an https:// URL" }),
+				yolo: Type.Optional(
+					Type.Boolean({
+						description:
+							"One-shot: write every note, autolink, and the reference note without pausing for review. " +
+							"Defaults to the session mode (`slipbox --yolo`), otherwise false (review at the seams).",
+					}),
+				),
 		}),
-		async execute(_id: string, params: { source: string }, _signal: unknown, onUpdate: OnUpdate, ctx: ExtensionContext) {
+		async execute(_id: string, params: { source: string; yolo?: boolean }, _signal: unknown, onUpdate: OnUpdate, ctx: ExtensionContext) {
 			if (!(await isAvailable())) return say(qmdMissing(), { error: "qmd-missing" });
 			const config = loadConfig(ctx.cwd);
 			// URLs are ingested directly (fetched + archived); files are resolved under sources/.
@@ -61,7 +69,8 @@ export function registerIngest(pi: ExtensionAPI): void {
 			const result = await ingestSource(config, sourcePath);
 			onUpdate?.(say(`Clustered ${result.totalChunks} chunks into ${result.clusters.length} ideas.`));
 
-			return say(renderIngest(result, config.found), { ingest: result });
+			const yolo = params.yolo ?? yoloDefault();
+			return say(renderIngest(result, config.found, yolo), { ingest: result, yolo });
 		},
 	});
 }
@@ -70,9 +79,22 @@ export function registerIngest(pi: ExtensionAPI): void {
 const SHOW_THEMES = 40;
 const EXCERPT_LEN = 220;
 
-function renderIngest(r: import("../pipeline/ingest.js").IngestResult, found: boolean): string {
+function renderIngest(r: import("../pipeline/ingest.js").IngestResult, found: boolean, yolo: boolean): string {
 	const themes = r.clusters.filter((c) => c.size >= 2);
 	const singles = r.clusters.filter((c) => c.size === 1);
+
+	// Review mode (default) stops at the seams for human input; yolo runs the
+	// whole pipeline through to the reference note in one go.
+	const pacing = yolo
+		? [
+				"**One-shot mode (--yolo): do not stop for review.** Work through every substantive cluster now, then finish the",
+				"whole pipeline in this turn: all literature notes → `slipbox_autolink` → `slipbox_write_reference_note`. Don't ask",
+				"for confirmation between steps or report back mid-way; summarize what you wrote once it's all done.",
+			]
+		: [
+				"**Review mode: keep the human in the loop.** Show what you found and check in before writing a batch of notes,",
+				"rather than writing everything silently. (Run `slipbox --yolo`, or pass `yolo: true`, for one-shot.)",
+			];
 
 	const head = [
 		found ? "" : "Note: no .slipbox config found — used defaults in the current directory.",
@@ -80,6 +102,8 @@ function renderIngest(r: import("../pipeline/ingest.js").IngestResult, found: bo
 		`- reference: ${r.reference.link}  (${r.reference.relPath})`,
 		`- extracted text: ${r.extracted.relPath}`,
 		`- ${r.totalChunks} chunks → ${themes.length} recurring themes + ${singles.length} one-off passages`,
+		"",
+		...pacing,
 		"",
 		"For each SUBSTANTIVE theme below: first call `slipbox_read_cluster` with this source and the cluster's chunk seqs to",
 		"read the FULL passages, then write a literature note that EXPLAINS the idea — summarizing all those passages,",

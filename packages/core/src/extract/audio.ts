@@ -21,7 +21,7 @@ export const audioExtractor: Extractor = {
 				timeout: 3_600_000, // transcription can be slow
 			});
 			const txt = (await readdir(dir)).find((f) => f.endsWith(".txt"));
-			const transcript = txt ? (await readFile(join(dir, txt), "utf8")).trim() : "";
+			const transcript = txt ? joinSegments(await readFile(join(dir, txt), "utf8")) : "";
 			const title = basename(source, extname(source)).replace(/[-_]+/g, " ").trim();
 			return {
 				markdown: `# ${title}\n\n${transcript || "(transcription produced no text)"}`,
@@ -32,3 +32,17 @@ export const audioExtractor: Extractor = {
 		}
 	},
 };
+
+/**
+ * Whisper's .txt output is one line per speech segment. Join them back into
+ * flowing prose so QMD chunks on sentences rather than on transcript segments.
+ */
+export function joinSegments(txt: string): string {
+	return txt
+		.split(/\r?\n/)
+		.map((l) => l.trim())
+		.filter(Boolean)
+		.join(" ")
+		.replace(/\s+/g, " ")
+		.trim();
+}

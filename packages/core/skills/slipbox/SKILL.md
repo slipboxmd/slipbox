@@ -46,6 +46,11 @@ starting; if not, tell the user how to install them (`slipbox_doctor`).
    The harness always writes its own cleaned copy under `sources/extracted/` —
    that's derived; never ingest from there.
 
+   For URL sources the harness also pins a **Wayback snapshot** (`archived` +
+   `archived_date` in the reference), so a note still points at the page as it was
+   when it was read even if the live URL changes. Cite `archived` when the live
+   page no longer matches the note.
+
    Each format needs an external CLI (pdftotext, pandoc, trafilatura, yt-dlp,
    whisper). Run `slipbox_doctor` to see what's installed and what each unlocks;
    guide the user to install any missing one. See `docs/FORMATS.md` for the full
@@ -78,8 +83,17 @@ starting; if not, tell the user how to install them (`slipbox_doctor`).
    whole-source summary + links to the literature notes onto the one reference
    file created at ingest (it does not create a second file).
 
-Prefer running the pipeline step-by-step with human review at the seams rather
-than one silent batch. Show what you found before writing many files.
+## Pacing: review mode vs one-shot
+
+- **Review mode (default)** — run the pipeline step-by-step with human review at
+  the seams. Show what you found before writing many files.
+- **One-shot / yolo** — when the session was started with `slipbox --yolo` (or
+  `slipbox_ingest` was called with `yolo: true`), do NOT pause: work through every
+  substantive cluster, write all the literature notes, autolink, and write the
+  reference note in one go, then summarize what you wrote.
+
+`slipbox_ingest` tells you which mode is active in its result; follow it.
+`slipbox_status` also reports the current mode.
 
 ## Rules
 
