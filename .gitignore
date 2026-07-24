@@ -17,3 +17,7 @@ dist/
 
 # Never track a stray QMD index in the harness repo itself
 .qmd/
+
+# Explorer working copy + static export (derived, per-slipbox)
+.slipbox-site/
+out/

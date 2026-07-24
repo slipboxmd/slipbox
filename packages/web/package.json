@@ -1,0 +1,48 @@
+{
+  "name": "@slipbox/web",
+  "version": "0.0.0",
+  "description": "The Slipbox explorer — a Next.js site for reading and navigating a slipbox.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Zachary Fleischmann",
+  "homepage": "https://slipbox.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slipboxmd/slipbox.git",
+    "directory": "packages/web"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "app",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "d3-force": "^3.0.0",
+    "d3-quadtree": "^3.0.1",
+    "marked": "^18.0.7",
+    "next": "^15.5.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/d3-force": "^3.0.10",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

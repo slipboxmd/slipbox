@@ -15,6 +15,7 @@ import { registerIngest } from "./tools/ingest.js";
 import { registerReadCluster } from "./tools/read-cluster.js";
 import { registerReindex } from "./tools/reindex.js";
 import { registerSearch } from "./tools/search.js";
+import { registerServe } from "./tools/serve.js";
 import { registerSources } from "./tools/sources.js";
 import { registerStatus } from "./tools/status.js";
 import { registerWrite } from "./tools/write.js";
@@ -32,6 +33,7 @@ export default function slipbox(pi: ExtensionAPI): void {
 	registerSearch(pi);
 	registerReindex(pi);
 	registerStatus(pi);
+	registerServe(pi);
 	registerInit(pi);
 	registerTutor(pi);
 
