@@ -8,7 +8,7 @@ milestones (PHASE1.md). Updated 2026-07-24.
 | Phase | State |
 | --- | --- |
 | 1. Build the slipbox (ingest → notes) | **DONE.** All Phase-1 milestones complete; any source format → notes. |
-| 2. Render the slipbox (localhost explorer) | **NEXT — not started.** Reference `links:` + note `source:`/`links:` already give the backlink graph it will render. |
+| 2. Render the slipbox (localhost explorer) | **NEXT — spec'd, not built.** See `plans/PHASE2_EXPLORER.md`. Reference `links:` + note `source:`/`links:` already give the backlink graph it will render. |
 | 3. Skills & tools for search + curation | Partial: `slipbox_search`, `slipbox_status`, `slipbox_sources`, `slipbox_feed`. Curation (dedup/merge/prune/refine) not started. |
 | 4. Maps of Content | Not started (needs two-level "theme" grouping over clusters). |
 | 5. Permanent notes | Not started. |
@@ -67,8 +67,10 @@ non-fatal; see `docs/FORMATS.md`.
 
 ## Later (rough order)
 
-1. **Phase 2 explorer** — localhost site rendering the backlink graph + note pages.
-   *Next up.* The data it needs (`links:`, `source:`) already exists on every note.
+1. **Phase 2 explorer** — Next.js site: `slipbox serve` for a live-reloading
+   localhost read, `slipbox build` for a static export to Vercel/GitHub Pages.
+   *Spec'd in `plans/PHASE2_EXPLORER.md`; ready to build.* The data it needs
+   (`links:`, `source:`) already exists on every note.
 2. **Phase 4 MOCs** — theme-level grouping over clusters.
 3. **Phase 3 curation** — dedup / merge / prune / refine tools.
 4. **Phase 5 permanent notes** — the literature→permanent promotion workflow.
