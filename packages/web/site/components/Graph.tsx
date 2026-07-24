@@ -16,7 +16,7 @@ import { TYPE_LABEL } from "@lib/model.js";
  * doesn't turn into a wall of text.
  */
 
-type SimNode = GraphNode & { x: number; y: number; vx?: number; vy?: number; fx?: number | null; fy?: number | null };
+type SimNode = GraphNode & { x?: number; y?: number; vx?: number; vy?: number; fx?: number | null; fy?: number | null };
 type SimEdge = { source: SimNode | string; target: SimNode | string };
 
 const TYPE_ORDER: NoteType[] = ["reference", "literature-note", "permanent-note", "moc"];
@@ -63,7 +63,9 @@ export function Graph({ data }: { data: GraphData }) {
 		if (!canvas || !wrap) return;
 
 		const visible = new Set(data.nodes.filter((n) => !hidden.has(n.type)).map((n) => n.id));
-		const nodes: SimNode[] = data.nodes.filter((n) => visible.has(n.id)).map((n) => ({ ...n, x: 0, y: 0 }));
+		// No initial x/y: d3 seeds them on a phyllotaxis spiral, which unfolds far
+		// better than every node starting stacked at the origin.
+		const nodes: SimNode[] = data.nodes.filter((n) => visible.has(n.id)).map((n) => ({ ...n }));
 		const byId = new Map(nodes.map((n) => [n.id, n]));
 		const edges: SimEdge[] = data.edges
 			.filter((e) => visible.has(e.source) && visible.has(e.target))
@@ -85,8 +87,10 @@ export function Graph({ data }: { data: GraphData }) {
 
 		const radius = (n: SimNode) => 3 + Math.min(7, Math.sqrt(n.degree) * 2);
 
+		// Small graphs need gentler repulsion or they fling themselves off-canvas.
+		const charge = nodes.length < 40 ? -80 : -160;
 		const sim = forceSimulation<SimNode>(nodes)
-			.force("charge", forceManyBody<SimNode>().strength(-160).distanceMax(600))
+			.force("charge", forceManyBody<SimNode>().strength(charge).distanceMax(600))
 			.force(
 				"link",
 				forceLink<SimNode, SimEdge>(edges)
@@ -118,15 +122,15 @@ export function Graph({ data }: { data: GraphData }) {
 			for (const e of edges) {
 				const s = e.source as SimNode;
 				const t = e.target as SimNode;
-				ctx.moveTo(s.x, s.y);
-				ctx.lineTo(t.x, t.y);
+				ctx.moveTo(s.x ?? 0, s.y ?? 0);
+				ctx.lineTo(t.x ?? 0, t.y ?? 0);
 			}
 			ctx.stroke();
 			ctx.globalAlpha = 1;
 
 			for (const n of nodes) {
 				ctx.beginPath();
-				ctx.arc(n.x, n.y, radius(n), 0, Math.PI * 2);
+				ctx.arc(n.x ?? 0, n.y ?? 0, radius(n), 0, Math.PI * 2);
 				ctx.fillStyle = TYPE_COLOR[n.type];
 				ctx.fill();
 				if (hover?.id === n.id) {
@@ -144,13 +148,53 @@ export function Graph({ data }: { data: GraphData }) {
 				for (const n of nodes) {
 					if (scale <= 1.4 && hover?.id !== n.id) continue;
 					const label = n.label.length > 42 ? `${n.label.slice(0, 40)}…` : n.label;
-					ctx.fillText(label, n.x, n.y - radius(n) - 5 / scale);
+					ctx.fillText(label, n.x ?? 0, (n.y ?? 0) - radius(n) - 5 / scale);
 				}
 			}
 			ctx.restore();
 		};
 
-		sim.on("tick", draw);
+		/** Frame the whole graph in the canvas — the layout's extent isn't known up front. */
+		const fit = () => {
+			if (nodes.length === 0) return;
+			let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+			for (const n of nodes) {
+				minX = Math.min(minX, n.x ?? 0);
+				maxX = Math.max(maxX, n.x ?? 0);
+				minY = Math.min(minY, n.y ?? 0);
+				maxY = Math.max(maxY, n.y ?? 0);
+			}
+			// Generous padding: labels are drawn centred above their node and would
+			// otherwise clip against the canvas edge.
+			const pad = 110;
+			const w = Math.max(1, maxX - minX);
+			const h = Math.max(1, maxY - minY);
+			const scale = Math.min(4, Math.max(0.2, Math.min((width - pad * 2) / w, (height - pad * 2) / h)));
+			view.current.scale = scale;
+			view.current.x = width / 2 - ((minX + maxX) / 2) * scale;
+			view.current.y = height / 2 - ((minY + maxY) / 2) * scale;
+		};
+
+		// React StrictMode runs this effect twice in dev, so anything asynchronous
+		// has to be cancellable or a discarded run can repaint with stale state.
+		let cancelled = false;
+		const paint = () => {
+			if (!cancelled) draw();
+		};
+
+		// Settle the layout synchronously rather than watching it animate into place.
+		// d3's simulation timer is driven by requestAnimationFrame, which browsers
+		// throttle in background tabs — relying on it for the first paint means the
+		// graph can come up blank. Running the ticks up front is deterministic, and
+		// arriving at a settled, framed graph reads better than a jittering one.
+		sim.stop();
+		const settleTicks = Math.min(400, Math.max(120, nodes.length * 6));
+		sim.tick(settleTicks);
+		fit();
+		paint();
+
+		// Ticks still paint while the simulation is running during a node drag.
+		sim.on("tick", paint);
 
 		// --- interaction -----------------------------------------------------
 		const toGraph = (clientX: number, clientY: number) => {
@@ -164,7 +208,7 @@ export function Graph({ data }: { data: GraphData }) {
 			let best: SimNode | null = null;
 			let bestD = Infinity;
 			for (const n of nodes) {
-				const d = (n.x - p.x) ** 2 + (n.y - p.y) ** 2;
+				const d = ((n.x ?? 0) - p.x) ** 2 + ((n.y ?? 0) - p.y) ** 2;
 				const r = radius(n) + 6;
 				if (d < r * r && d < bestD) {
 					best = n;
@@ -249,7 +293,8 @@ export function Graph({ data }: { data: GraphData }) {
 		const onResize = () => {
 			resize();
 			sim.force("center", forceCenter(width / 2, height / 2));
-			sim.alpha(0.3).restart();
+			fit();
+			draw();
 		};
 		window.addEventListener("resize", onResize);
 
@@ -260,6 +305,7 @@ export function Graph({ data }: { data: GraphData }) {
 		themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
 		return () => {
+			cancelled = true;
 			sim.stop();
 			canvas.removeEventListener("pointerdown", onDown);
 			canvas.removeEventListener("pointermove", onMove);

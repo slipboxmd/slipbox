@@ -29,6 +29,8 @@ if (args.includes("--help") || args.includes("-h") || args[0] === "help") {
 			"                           (required for GitHub Pages project sites)",
 			"",
 			"  slipbox site:init        Write deploy config (vercel.json + Pages workflow)",
+			"    --repo <name>          GitHub repo name for the Pages base path",
+			"                           (defaults to this folder's name)",
 			"    --force                Overwrite existing files",
 			"",
 			"Inside the harness:",
@@ -83,7 +85,7 @@ if (command === "serve") {
 } else if (command === "site:init") {
 	const { siteInit } = await import("@slipbox/web");
 	try {
-		const res = await siteInit(process.cwd(), { force: args.includes("--force") });
+		const res = await siteInit(process.cwd(), { force: args.includes("--force"), repoName: flag("repo") });
 		for (const p of res.written) console.log(`  wrote    ${p}`);
 		for (const p of res.skipped) console.log(`  exists   ${p}  (--force to overwrite)`);
 		console.log(

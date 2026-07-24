@@ -13,8 +13,8 @@ indexing/embedding/search go through [QMD](https://github.com/tobi/qmd), and
 extraction uses local CLIs (`pdftotext`, `pandoc`, `trafilatura`, `yt-dlp`,
 `ffmpeg`, `whisper`), all detected and guided rather than bundled.
 
-> Status: **Phase 1 complete** — ingestion works end-to-end for every supported
-> format. Phase 2 (the localhost explorer) is next. See
+> Status: **Phases 1 and 2 complete** — ingestion works end-to-end for every
+> supported format, and `slipbox serve` renders the result as a readable site. See
 > [docs/plans/ROADMAP.md](docs/plans/ROADMAP.md) for live status,
 > [docs/PROJECT.md](docs/PROJECT.md) for the vision, and
 > [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the design.
@@ -44,8 +44,8 @@ See [docs/plans/MONOREPO.md](docs/plans/MONOREPO.md).
 ```
 packages/
   core/     @slipbox/core   The harness: ingest → notes → search (Pi extension + skill)
+  web/      @slipbox/web    The explorer: `slipbox serve` / `slipbox build` (Next.js)
   cli/      slipbox         Standalone `slipbox` command (branded Pi launcher)
-apps/                        (future) explorer web app
 docs/                        Vision, architecture, Pi reference, plans
 ```
 
@@ -104,6 +104,20 @@ seams. To run it straight through instead:
 ```bash
 slipbox --yolo                   # ingest → all notes → autolink → reference note
 ```
+
+## Reading your slipbox
+
+```bash
+slipbox serve                    # http://localhost:3000, live-reloads as notes are written
+slipbox build                    # -> ./out, a static site for Vercel/GitHub Pages/anywhere
+slipbox site:init                # write deploy config (vercel.json + Pages workflow)
+```
+
+The explorer renders your notes as a reading-first site — serif prose, generous
+whitespace, light and dark — with backlinks and source provenance on every note,
+client-side search, and an interactive graph of the whole network. The agent can
+open it mid-session with the `slipbox_serve` tool, so you can watch the slipbox
+grow as it works. Design record: [docs/plans/PHASE2_EXPLORER.md](docs/plans/PHASE2_EXPLORER.md).
 
 ## Documentation
 
