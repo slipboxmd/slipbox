@@ -28,12 +28,33 @@ Indexing, embedding, and search are done by **QMD** (an external tool, like
 yt-dlp/ffmpeg). Confirm `qmd` and any needed extraction CLI are installed before
 starting; if not, tell the user how to install them (`slipbox_doctor`).
 
-   **Sources live in the slipbox's `sources/` folder.** To see what's available,
-   call `slipbox_sources` (it lists each file with its title) — don't hunt with
-   find/grep or read files to identify them. Then call `slipbox_ingest` with the
-   filename. If the source isn't in `sources/`, ask the user to drop it there. The
-   harness writes its own cleaned copy under `sources/extracted/` — that's
-   derived; never ingest from there.
+   **A source is either a file or a URL.**
+   - **Files** live in the slipbox's `sources/` folder. To see what's available,
+     call `slipbox_sources` (it lists each file with its title) — don't hunt with
+     find/grep. Then call `slipbox_ingest` with the filename. Supported file types:
+     `.txt`/`.md`, `.pdf`, `.epub`/`.docx`/`.html`/`.odt`/`.rtf`, and audio
+     (`.mp3`/`.m4a`/`.wav`/…). If a source isn't in `sources/`, ask the user to drop
+     it there.
+   - **URLs** are ingested directly — pass the full `https://…` URL to
+     `slipbox_ingest`. A web-page URL is read as an article; a YouTube URL is read
+     as its transcript. The harness fetches it and archives a markdown **capture**
+     into `sources/` (the source of record), so URL sources don't need a local file.
+   - **Feeds** (RSS/Atom for a blog, newsletter, or podcast) are NOT one source —
+     call `slipbox_feed(url)` to list recent items, then ingest the worthwhile ones
+     individually by their links.
+
+   The harness always writes its own cleaned copy under `sources/extracted/` —
+   that's derived; never ingest from there.
+
+   For URL sources the harness also pins a **Wayback snapshot** (`archived` +
+   `archived_date` in the reference), so a note still points at the page as it was
+   when it was read even if the live URL changes. Cite `archived` when the live
+   page no longer matches the note.
+
+   Each format needs an external CLI (pdftotext, pandoc, trafilatura, yt-dlp,
+   whisper). Run `slipbox_doctor` to see what's installed and what each unlocks;
+   guide the user to install any missing one. See `docs/FORMATS.md` for the full
+   dependency table.
 
 1. **Extract** — `slipbox_ingest` extracts the source, strips boilerplate, and
    writes a cleaned copy to `extracted/` for QMD. The user's original in
@@ -62,8 +83,17 @@ starting; if not, tell the user how to install them (`slipbox_doctor`).
    whole-source summary + links to the literature notes onto the one reference
    file created at ingest (it does not create a second file).
 
-Prefer running the pipeline step-by-step with human review at the seams rather
-than one silent batch. Show what you found before writing many files.
+## Pacing: review mode vs one-shot
+
+- **Review mode (default)** — run the pipeline step-by-step with human review at
+  the seams. Show what you found before writing many files.
+- **One-shot / yolo** — when the session was started with `slipbox --yolo` (or
+  `slipbox_ingest` was called with `yolo: true`), do NOT pause: work through every
+  substantive cluster, write all the literature notes, autolink, and write the
+  reference note in one go, then summarize what you wrote.
+
+`slipbox_ingest` tells you which mode is active in its result; follow it.
+`slipbox_status` also reports the current mode.
 
 ## Rules
 
@@ -79,8 +109,11 @@ than one silent batch. Show what you found before writing many files.
 Use the `slipbox_*` tools rather than hand-rolling files:
 
 - `slipbox_doctor` — check qmd + extractor CLIs; guide the user to install any gaps.
-- `slipbox_ingest(source)` — extract → index/embed → cluster; returns idea
+- `slipbox_ingest(source)` — extract → index/embed → cluster; `source` is a file in
+  `sources/` (by name) OR an `https://` URL (web article or YouTube). Returns idea
   clusters (with excerpts + chunk seqs) for you to write notes from.
+- `slipbox_feed(url)` — list recent items in an RSS/Atom feed to triage, then
+  ingest chosen items by their links.
 - `slipbox_write_note(title, body, source, …)` — write ONE literature note per
   cluster, in the user's words, linked to the source reference.
 - `slipbox_write_reference_note(reference, title, summary, literature_links)` —

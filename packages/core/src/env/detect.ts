@@ -30,11 +30,25 @@ const TOOLS: ToolSpec[] = [
 		installHint: "npm i -g @tobilu/qmd   (macOS also: brew install sqlite)",
 	},
 	{
+		name: "pdftotext",
+		versionArgs: ["-v"],
+		unlocks: "PDF → text extraction",
+		required: false,
+		installHint: "brew install poppler  (macOS)  |  apt-get install poppler-utils  (Linux)",
+	},
+	{
 		name: "pandoc",
 		versionArgs: ["--version"],
 		unlocks: "epub / docx / html → markdown extraction",
 		required: false,
 		installHint: "brew install pandoc  |  https://pandoc.org/installing.html",
+	},
+	{
+		name: "trafilatura",
+		versionArgs: ["--version"],
+		unlocks: "web article → markdown extraction (URL sources)",
+		required: false,
+		installHint: "pipx install trafilatura  |  pip3 install trafilatura",
 	},
 	{
 		name: "yt-dlp",

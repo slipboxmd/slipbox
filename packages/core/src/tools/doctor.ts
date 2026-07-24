@@ -8,7 +8,7 @@ export function registerDoctor(pi: ExtensionAPI): void {
 		name: "slipbox_doctor",
 		label: "Slipbox doctor",
 		description:
-			"Check which external tools (qmd, pandoc, yt-dlp, ffmpeg, whisper) are installed and what each unlocks. " +
+			"Check which external tools (qmd, pdftotext, pandoc, trafilatura, yt-dlp, ffmpeg, whisper) are installed and what each unlocks. " +
 			"Run before ingesting; guide the user to install any missing required tool.",
 		promptSnippet: "Verify the slipbox environment / available source formats.",
 		parameters: Type.Object({}),

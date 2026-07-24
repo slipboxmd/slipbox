@@ -1,7 +1,8 @@
 import type { SlipboxConfig } from "../config/types.js";
-import { extract } from "../extract/index.js";
+import { archiveUrl } from "../extract/archive.js";
+import { extract, isUrl } from "../extract/index.js";
 import { makeId } from "../notes/ids.js";
-import { writeExtracted, writeReference, type NoteRef } from "../notes/write.js";
+import { writeExtracted, writeReference, writeSourceCapture, type NoteRef } from "../notes/write.js";
 import { embed, ensureIndex, qmdDbPath, update } from "../qmd/cli.js";
 import { readChunks } from "../qmd/vectors.js";
 import { cluster } from "./cluster.js";
@@ -36,6 +37,18 @@ const MAX_EXCERPTS = 3;
 export async function ingestSource(config: SlipboxConfig, sourcePath: string): Promise<IngestResult> {
 	const { markdown, metadata } = await extract(sourcePath);
 	const id = makeId(metadata.title, config.notes.id_style);
+
+	if (isUrl(sourcePath)) {
+		// Pin a Wayback snapshot so the note survives the page changing (best-effort).
+		const snapshot = await archiveUrl(sourcePath);
+		if (snapshot) {
+			metadata.archived = snapshot.url;
+			if (snapshot.date) metadata.archived_date = snapshot.date;
+		}
+		// URL sources have no local original — archive the fetched markdown as the
+		// source of record in sources/. Dropped files already live there.
+		await writeSourceCapture(config, id, metadata, markdown);
+	}
 
 	const extracted = await writeExtracted(config, id, metadata, markdown);
 	const reference = await writeReference(config, id, metadata);

@@ -47,6 +47,27 @@ export async function writeExtracted(config: SlipboxConfig, id: string, _meta: S
 }
 
 /**
+ * For URL sources (web page / video / feed item), write the human-readable
+ * "capture" into `sources/` — frontmatter (title, origin URL, kind, date) + the
+ * fetched markdown. This is the archival source of record; the cleaned body still
+ * goes to `extracted/` for QMD. (For dropped files the original already lives in
+ * sources/, so this is skipped.)
+ */
+export async function writeSourceCapture(config: SlipboxConfig, id: string, meta: SourceMeta, markdown: string): Promise<NoteRef> {
+	const absDir = dirFor(config, "sources");
+	await mkdir(absDir, { recursive: true });
+	const path = join(absDir, `${id}.md`);
+	const data: Record<string, unknown> = { id, type: "source", title: meta.title, kind: meta.kind, origin: meta.origin, captured: today() };
+	if (meta.author) data.author = meta.author;
+	if (meta.date) data.date = meta.date;
+	if (meta.archived) data.archived = meta.archived;
+	if (meta.archived_date) data.archived_date = meta.archived_date;
+	await writeFile(path, stringifyFrontmatter(data, markdown), "utf8");
+	const relPath = relative(config.root, path);
+	return { id, path, relPath, link: linkFor(config, relPath.replace(/\.md$/, ""), meta.title) };
+}
+
+/**
  * Write the reference record for a source (bibliographic metadata). This is the
  * single per-source file; its whole-source summary + literature-note links are
  * filled in later by `updateReference`, so there is no separate reference-note.
@@ -62,6 +83,9 @@ export async function writeReference(config: SlipboxConfig, id: string, meta: So
 	};
 	if (meta.author) data.author = meta.author;
 	if (meta.date) data.date = meta.date;
+	// A web source can change or disappear; the Wayback snapshot pins what we read.
+	if (meta.archived) data.archived = meta.archived;
+	if (meta.archived_date) data.archived_date = meta.archived_date;
 	return persist(config, dirFor(config, "references"), id, data, `# ${meta.title}\n`);
 }
 

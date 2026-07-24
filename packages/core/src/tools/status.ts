@@ -2,6 +2,7 @@ import { existsSync, readdirSync } from "node:fs";
 import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { dirFor, loadConfig } from "../config/slipbox-config.js";
+import { yoloDefault } from "../env/mode.js";
 import type { SlipboxPaths } from "../config/types.js";
 import { isAvailable, qmdDbPath } from "../qmd/cli.js";
 
@@ -23,6 +24,7 @@ export function registerStatus(pi: ExtensionAPI): void {
 			const counts = Object.fromEntries(keys.map((k) => [k, countMd(dirFor(config, k))]));
 			const qmdOk = await isAvailable();
 			const indexed = existsSync(qmdDbPath(config.root));
+			const yolo = yoloDefault();
 
 			const lines = [
 				`Slipbox root: ${config.root}${config.found ? "" : "  (no .slipbox found — using defaults)"}`,
@@ -35,8 +37,9 @@ export function registerStatus(pi: ExtensionAPI): void {
 				"",
 				`QMD installed: ${qmdOk ? "yes" : "no"}`,
 				`Index present: ${indexed ? "yes" : "no (run slipbox_reindex or ingest a source)"}`,
+				`Ingest mode:   ${yolo ? "one-shot (--yolo) — no pausing for review" : "review (default) — check in at the seams"}`,
 			];
-			return { content: [{ type: "text", text: lines.join("\n") }], details: { counts, qmdOk, indexed, found: config.found } };
+			return { content: [{ type: "text", text: lines.join("\n") }], details: { counts, qmdOk, indexed, found: config.found, yolo } };
 		},
 	});
 }

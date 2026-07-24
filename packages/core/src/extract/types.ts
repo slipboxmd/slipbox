@@ -1,4 +1,4 @@
-export type SourceKind = "text" | "markdown" | "pdf" | "epub" | "html" | "youtube" | "audio";
+export type SourceKind = "text" | "markdown" | "pdf" | "epub" | "html" | "web" | "youtube" | "audio" | "feed";
 
 export interface SourceMeta {
 	title: string;
@@ -7,6 +7,10 @@ export interface SourceMeta {
 	kind: SourceKind;
 	/** Original path or URL. */
 	origin: string;
+	/** Wayback snapshot URL pinning a web source as it was at ingest (URL sources only). */
+	archived?: string;
+	/** Date of that snapshot (YYYY-MM-DD). */
+	archived_date?: string;
 }
 
 export interface Extracted {
