@@ -21,30 +21,37 @@ milestones (PHASE1.md). Updated 2026-07-23.
   `/tutor`, `slipbox_sources`, doctor/status/reindex.
 - **M1 — review UX / flags: partial.** Agent drives the pipeline step-by-step
   with the human in the loop; no explicit one-shot `--yolo` flag yet.
-- **M2 — source formats: NEXT (not started).** Only `.txt`/`.md` today.
+- **M2 — source formats: FIRST PASS BUILT (pending joint testing).** `slipbox_ingest`
+  now accepts files *and* URLs; per-format extractors below. See `docs/FORMATS.md`.
 - **M3 — clustering quality: DONE.** Average-linkage (fixed the 219-singleton
   problem), Gutenberg cleaning, tuned cutoff, autolink nearest-neighbor guarantee.
 
-## What's next: M2 — source formats
+## M2 — source formats (first pass)
 
-This is the priority, and it's exactly what the example slipboxes below need. Each
-extractor follows "guide-don't-bundle": detect a local CLI, guide the user to
-install it if missing, shell out. `slipbox_ingest` also needs to accept **URLs**
-(fetch), not just files in `sources/`.
+Each extractor follows "guide-don't-bundle": detect a local CLI, shell out, and
+fail with a one-line install hint if it's missing (`slipbox_doctor` inventories
+them). `slipbox_ingest` accepts a `sources/` filename OR an `https://` URL; feeds
+are triaged with the new `slipbox_feed` tool.
 
-| Source | Extractor approach | External tool |
+| Source | External tool | Status |
 | --- | --- | --- |
-| Book (txt/md) | passthrough + clean | — (done) |
-| PDF | `pdftotext` (poppler) or a TS lib | pdftotext |
-| epub / docx | pandoc → markdown | pandoc |
-| Web article (URL) | fetch + readability → markdown | — (TS) or pandoc |
-| YouTube | subtitles/transcript | yt-dlp |
-| RSS feed | parse feed → each item = a web article | — (TS) + web extractor |
-| Audio / podcast | download + transcribe | yt-dlp + whisper |
+| Book (txt/md) | — | ✅ done |
+| PDF | pdftotext + pdfinfo (poppler) | ✅ tested (AI corpus) |
+| epub / docx / html / odt / rtf | pandoc | ✅ tested (epub) |
+| Web article (URL) | trafilatura | ✅ tested |
+| YouTube (URL) | yt-dlp | ✅ tested (transcript) |
+| RSS / Atom feed | — (native fetch) | ✅ tested (RSS + Atom) |
+| Audio / podcast | whisper (+ ffmpeg) | ⚠️ built, not yet run (whisper not installed here) |
 
 Chunking/clustering already works on any text, so once a format lands as clean
 markdown, the rest of the pipeline is free. Spoken-word transcripts (podcasts,
 talks) may want lighter cleaning + different cluster tuning — worth watching.
+
+**Open item for joint review:** URL sources write a `sources/<id>.md` capture that
+is currently double-indexed alongside its `sources/extracted/` copy (search noise
+only; clustering/linking are unaffected). Fix = scope the QMD collection to the
+content dirs or relocate captures — deferred as it touches the locked
+single-collection design. Details in `docs/FORMATS.md`.
 
 ## Later (rough order)
 

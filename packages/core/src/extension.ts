@@ -10,6 +10,7 @@ import { registerTutor } from "./commands/tutor.js";
 import { loadConfig } from "./config/slipbox-config.js";
 import { registerAutolink } from "./tools/link.js";
 import { registerDoctor } from "./tools/doctor.js";
+import { registerFeed } from "./tools/feed.js";
 import { registerIngest } from "./tools/ingest.js";
 import { registerReadCluster } from "./tools/read-cluster.js";
 import { registerReindex } from "./tools/reindex.js";
@@ -24,6 +25,7 @@ export default function slipbox(pi: ExtensionAPI): void {
 	registerDoctor(pi);
 	registerSources(pi);
 	registerIngest(pi);
+	registerFeed(pi);
 	registerReadCluster(pi);
 	registerWrite(pi);
 	registerAutolink(pi);

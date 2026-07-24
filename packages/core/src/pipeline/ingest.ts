@@ -1,7 +1,7 @@
 import type { SlipboxConfig } from "../config/types.js";
-import { extract } from "../extract/index.js";
+import { extract, isUrl } from "../extract/index.js";
 import { makeId } from "../notes/ids.js";
-import { writeExtracted, writeReference, type NoteRef } from "../notes/write.js";
+import { writeExtracted, writeReference, writeSourceCapture, type NoteRef } from "../notes/write.js";
 import { embed, ensureIndex, qmdDbPath, update } from "../qmd/cli.js";
 import { readChunks } from "../qmd/vectors.js";
 import { cluster } from "./cluster.js";
@@ -36,6 +36,10 @@ const MAX_EXCERPTS = 3;
 export async function ingestSource(config: SlipboxConfig, sourcePath: string): Promise<IngestResult> {
 	const { markdown, metadata } = await extract(sourcePath);
 	const id = makeId(metadata.title, config.notes.id_style);
+
+	// URL sources have no local original — archive the fetched markdown as the
+	// source of record in sources/. Dropped files already live there.
+	if (isUrl(sourcePath)) await writeSourceCapture(config, id, metadata, markdown);
 
 	const extracted = await writeExtracted(config, id, metadata, markdown);
 	const reference = await writeReference(config, id, metadata);

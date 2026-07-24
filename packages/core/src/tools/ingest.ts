@@ -4,6 +4,7 @@ import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { dirFor, loadConfig } from "../config/slipbox-config.js";
 import type { SlipboxConfig } from "../config/types.js";
+import { isUrl } from "../extract/index.js";
 import { ingestSource } from "../pipeline/ingest.js";
 import { isAvailable } from "../qmd/cli.js";
 import { say, type OnUpdate } from "./result.js";
@@ -37,7 +38,8 @@ export function registerIngest(pi: ExtensionAPI): void {
 			"Sources live in the slipbox's `sources/` folder — pass just the filename (e.g. `confessions.txt`) and it's resolved " +
 			"there. Returns candidate idea clusters (recurring themes first) with excerpts. Review them and write a literature " +
 			"note for each SUBSTANTIVE idea with slipbox_write_note — no fixed count; a longer source yields more; skip thin or " +
-			"boilerplate clusters. Then slipbox_autolink and a reference note. Phase-1 supports .txt/.md sources.",
+			"boilerplate clusters. Then slipbox_autolink and a reference note. A source may be a file in sources/ " +
+				"(.txt/.md, .pdf, .epub/.docx/.html, or audio) OR an https:// URL (web article or YouTube video).",
 		promptSnippet: "Bring a new source (from sources/) into the slipbox and get idea clusters.",
 		parameters: Type.Object({
 			source: Type.String({ description: "Source filename in sources/ (e.g. confessions.txt), or a path to the file" }),
@@ -45,11 +47,12 @@ export function registerIngest(pi: ExtensionAPI): void {
 		async execute(_id: string, params: { source: string }, _signal: unknown, onUpdate: OnUpdate, ctx: ExtensionContext) {
 			if (!(await isAvailable())) return say(qmdMissing(), { error: "qmd-missing" });
 			const config = loadConfig(ctx.cwd);
-			const sourcePath = resolveSource(config, ctx.cwd, params.source);
+			// URLs are ingested directly (fetched + archived); files are resolved under sources/.
+			const sourcePath = isUrl(params.source) ? params.source.trim() : resolveSource(config, ctx.cwd, params.source);
 			if (!sourcePath) {
 				return say(
 					`Couldn't find "${params.source}". Sources should be in ${dirFor(config, "sources")} — ` +
-						`drop the file there (or pass a full path). Then ingest by filename.`,
+						`drop the file there (or pass a full path or https:// URL). Then ingest.`,
 					{ error: "source-not-found" },
 				);
 			}

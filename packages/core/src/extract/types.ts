@@ -1,4 +1,4 @@
-export type SourceKind = "text" | "markdown" | "pdf" | "epub" | "html" | "youtube" | "audio";
+export type SourceKind = "text" | "markdown" | "pdf" | "epub" | "html" | "web" | "youtube" | "audio" | "feed";
 
 export interface SourceMeta {
 	title: string;
