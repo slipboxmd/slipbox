@@ -25,21 +25,21 @@ semantics* on top of QMD.
 ```
 source (epub/pdf/url/youtube/audio/…)
    │  [harness] extract via guided CLIs (pandoc/yt-dlp/whisper/…)
-   ▼
+   
 reference.md + raw extracted text  (flat markdown in the slipbox)
    │  [QMD] qmd update  → FTS5 index
    │  [QMD] qmd embed   → chunk + vector store (sqlite-vec)
-   ▼
+   
 chunk vectors (owned by QMD's sqlite)
    │  [harness] pull vectors, cluster by similarity      ← see O4 + the vector-access spike
-   ▼
+   
 idea clusters
    │  [harness + LLM] write one literature note per cluster
-   ▼
+   
 literature notes (flat markdown, frontmatter + [[links]])
    │  [QMD] re-index/embed the new notes
    │  [harness + LLM] synthesize source-level summary
-   ▼
+   
 reference note
 ```
 

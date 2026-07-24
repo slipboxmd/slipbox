@@ -173,6 +173,43 @@ main {
 	font: inherit;
 	cursor: pointer;
 	border-radius: var(--radius);
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+/* Icons sit slightly below the cap height of the label they accompany. */
+.site-nav svg {
+	width: 1.05em;
+	height: 1.05em;
+	flex: none;
+	transform: translateY(0.5px);
+}
+
+/* Holds the toggle's width before the theme resolves, so the header can't shift. */
+.icon-placeholder {
+	display: inline-block;
+	width: 1.05em;
+	height: 1.05em;
+}
+
+/* On narrow screens the labels go and the icons carry the nav on their own. */
+@media (max-width: 560px) {
+	.site-nav a span {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+	.site-nav {
+		gap: var(--space-2);
+	}
+	.site-nav svg {
+		width: 1.25em;
+		height: 1.25em;
+	}
 }
 
 .site-nav a:hover,

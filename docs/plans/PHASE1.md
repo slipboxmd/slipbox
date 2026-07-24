@@ -16,15 +16,15 @@ then widened. Each milestone is independently demoable. Decisions from
 ## Definition of done (Phase 1)
 
 Running Pi with `pi-slipbox` in a slipbox dir, the agent can:
-1. ✅ `ingest <source>` → writes a `reference`, N `literature-notes` (one idea each,
+1. `ingest <source>` → writes a `reference`, N `literature-notes` (one idea each,
    linked to the reference + supporting chunks), and a whole-source summary.
    *(Shipped beyond plan: any format — PDF/epub/docx/html/audio — plus URLs.
    Divergence: the summary lands on the **same** reference file rather than a
    separate `reference-note`; see "Note types" below.)*
-2. ✅ Do this **step-by-step with review** (default) or **one-shot** (`--yolo`).
-3. ✅ Report tool/model readiness via `slipbox_doctor`; degrade gracefully when an
+2. Do this **step-by-step with review** (default) or **one-shot** (`--yolo`).
+3. Report tool/model readiness via `slipbox_doctor`; degrade gracefully when an
    extractor is missing (`MissingToolError` carries the install hint).
-4. ✅ Rebuild the QMD index from markdown at any time (`slipbox_reindex`).
+4. Rebuild the QMD index from markdown at any time (`slipbox_reindex`).
 
 Out of scope for Phase 1: rendering (P2), curation tools (P3), MOCs (P4),
 permanent notes (P5), non-text source formats beyond a first couple.
@@ -87,7 +87,7 @@ peer/provided.
 
 ## Milestones
 
-### M0 — Walking skeleton: text file → literature notes (end-to-end) — ✅ DONE
+### M0 — Walking skeleton: text file → literature notes (end-to-end) — DONE
 The thinnest path that touches every stage. Prove it, then widen.
 - `config/slipbox-config.ts`: locate `.slipbox` from cwd upward; parse; defaults.
 - `env/detect.ts` + `tools/doctor.ts`: detect `qmd`; print guidance if missing.
@@ -104,7 +104,7 @@ The thinnest path that touches every stage. Prove it, then widen.
 - **Demo:** `ingest ./docs/some-essay.md` → reference + literature notes +
   reference note appear as markdown; `qmd query` finds them.
 
-### M1 — Review UX + one-shot flag + status — ✅ DONE
+### M1 — Review UX + one-shot flag + status — DONE
 - Step-by-step gating using `ctx.ui` (show candidate clusters/notes, confirm
   before writing). `--yolo` flag runs straight through.
 - `tools/status.ts`: counts by type, orphans (notes with no links), QMD index
@@ -112,13 +112,13 @@ The thinnest path that touches every stage. Prove it, then widen.
 - `tools/reindex.ts`: `qmd update && qmd embed` wrapper.
 - Inject `.slipbox` house style into agent context (the `context` event).
 
-### M2 — Widen source formats (guided extractors) — ✅ DONE (see docs/FORMATS.md)
+### M2 — Widen source formats (guided extractors) — DONE (see docs/FORMATS.md)
 - `extract/pdf.ts` (TS lib or `pdftotext`), `extract/html.ts`/article, then
   `epub` (pandoc), `youtube` (yt-dlp subs/audio), `audio` (ffmpeg + whisper).
 - Each: detect the needed CLI; if absent, `guide.ts` tells the user exactly how
   to install it and what it unlocks; skip that source type gracefully.
 
-### M3 — Quality pass on clustering + notes — ✅ DONE
+### M3 — Quality pass on clustering + notes — DONE
 - Tune chunk→cluster (threshold, kNN, min-cluster-size from `.slipbox`).
 - De-dupe near-identical literature notes; link related literature notes.
 - Optional: swap connected-components for HDBSCAN-js if quality warrants.

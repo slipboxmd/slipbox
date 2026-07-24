@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MoonIcon, SunIcon } from "./Icon";
 
 type Theme = "light" | "dark";
 
@@ -31,7 +32,8 @@ export function ThemeToggle() {
 
 	return (
 		<button type="button" onClick={toggle} aria-label="Toggle light and dark theme" title="Toggle theme">
-			{theme === null ? " " : theme === "dark" ? "☾" : "☀"}
+			{/* Nothing until the effect resolves the theme, so the icon can't flip after paint. */}
+			{theme === null ? <span className="icon-placeholder" /> : theme === "dark" ? <MoonIcon /> : <SunIcon />}
 		</button>
 	);
 }

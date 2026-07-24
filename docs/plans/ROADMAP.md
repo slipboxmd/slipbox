@@ -40,13 +40,13 @@ are triaged with the new `slipbox_feed` tool.
 
 | Source | External tool | Status |
 | --- | --- | --- |
-| Book (txt/md) | — | ✅ done |
-| PDF | pdftotext + pdfinfo (poppler) | ✅ tested (AI corpus) |
-| epub / docx / html / odt / rtf | pandoc | ✅ tested (epub) |
-| Web article (URL) | trafilatura | ✅ tested |
-| YouTube (URL) | yt-dlp | ✅ tested (transcript) |
-| RSS / Atom feed | — (native fetch) | ✅ tested (RSS + Atom) |
-| Audio / podcast | whisper (+ ffmpeg) | ✅ tested (60s clip → 16s, accurate) |
+| Book (txt/md) | — | done |
+| PDF | pdftotext + pdfinfo (poppler) | tested (AI corpus) |
+| epub / docx / html / odt / rtf | pandoc | tested (epub) |
+| Web article (URL) | trafilatura | tested |
+| YouTube (URL) | yt-dlp | tested (transcript) |
+| RSS / Atom feed | — (native fetch) | tested (RSS + Atom) |
+| Audio / podcast | whisper (+ ffmpeg) | tested (60s clip → 16s, accurate) |
 
 Chunking/clustering already works on any text, so once a format lands as clean
 markdown, the rest of the pipeline is free. Spoken-word transcripts (podcasts,
@@ -91,6 +91,6 @@ sources + notes):
 
 | Example | Repo | State |
 | --- | --- | --- |
-| odyssey | `example-odyssey` | ✅ corpus complete (public-domain scholarship); no notes yet |
-| ai | `example-ai` | ✅ 40-paper corpus; 9 literature notes from 3 papers |
-| sv-titans | `example-sv-titans` | ◑ 5 of ~14 authors acquired (182 files); 9 authors to go |
+| odyssey | `example-odyssey` | complete (public-domain scholarship); no notes yet |
+| ai | `example-ai` | 40-paper corpus; 9 literature notes from 3 papers |
+| sv-titans | `example-sv-titans` | partial — 5 of ~14 authors acquired (182 files); 9 authors to go |

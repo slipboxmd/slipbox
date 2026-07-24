@@ -4,9 +4,11 @@ import type { ToolInfo } from "./detect.js";
 export function renderReadiness(tools: ToolInfo[]): string {
 	const lines: string[] = ["# Slipbox environment", ""];
 	for (const t of tools) {
-		const mark = t.present ? "✓" : t.required ? "✗" : "○";
+		// Plain ASCII markers: this is terminal output, where glyph support varies
+		// and the status word already carries the meaning.
+		const mark = t.present ? "[ok]  " : t.required ? "[!]   " : "[--]  ";
 		const status = t.present ? t.version ?? "installed" : t.required ? "MISSING (required)" : "not installed";
-		lines.push(`${mark} ${t.name} — ${status}`);
+		lines.push(`${mark}${t.name} — ${status}`);
 		lines.push(`    unlocks: ${t.unlocks}`);
 		if (!t.present) lines.push(`    install: ${t.installHint}`);
 	}

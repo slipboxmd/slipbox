@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GraphIcon, SearchIcon, SourcesIcon } from "./Icon";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function SiteHeader({ name }: { name: string }) {
@@ -9,9 +10,18 @@ export function SiteHeader({ name }: { name: string }) {
 					{name}
 				</Link>
 				<nav className="site-nav">
-					<Link href="/references/">Sources</Link>
-					<Link href="/graph/">Graph</Link>
-					<Link href="/search/">Search</Link>
+					<Link href="/references/">
+						<SourcesIcon />
+						<span>Sources</span>
+					</Link>
+					<Link href="/graph/">
+						<GraphIcon />
+						<span>Graph</span>
+					</Link>
+					<Link href="/search/">
+						<SearchIcon />
+						<span>Search</span>
+					</Link>
 					<ThemeToggle />
 				</nav>
 			</div>

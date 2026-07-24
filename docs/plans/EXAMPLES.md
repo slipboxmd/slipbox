@@ -54,9 +54,9 @@ texts out of the harness repo's history.
 
 | Example | Theme | Format | Status |
 | --- | --- | --- | --- |
-| `odyssey/` | Homer's *Odyssey* — translations + commentary | book `.txt` | ✅ corpus complete (`example-odyssey`) |
-| `ai/` | The LLM & AI field — foundational papers | PDF | ✅ 40-paper corpus (`example-ai`) |
-| `sv-titans/` | Founder-essayists on building startups | web + PDF | ◑ 5 of ~14 authors acquired (`example-sv-titans`) |
+| `odyssey/` | Homer's *Odyssey* — translations + commentary | book `.txt` | complete (`example-odyssey`) |
+| `ai/` | The LLM & AI field — foundational papers | PDF | 40-paper corpus (`example-ai`) |
+| `sv-titans/` | Founder-essayists on building startups | web + PDF | partial — 5 of ~14 authors acquired (`example-sv-titans`) |
 | `classics/` | Christian thought & theology | book `.txt` | to move from `slipbox-test` (8 books + notes) |
 | `tools-for-thought/` | essays on thinking tools / note-taking | web | not started (extractor ready) |
 | `diary-of-a-ceo/` | the whole podcast | RSS / audio | not started (extractors ready); large — feed only, transcripts gitignored |
@@ -99,7 +99,7 @@ meaningful. Proposals — swap freely:
 
 | Example | Format | Sources | Tests | Needs |
 | --- | --- | --- | --- | --- |
-| `classics/` | book (.txt) | The Confessions, City of God, Jesus the Christ, The Man Who Was Thursday, St. Francis, … (Gutenberg) | large-book ingest, clustering, **cross-book linking** | ✅ works today (move `slipbox-test` here) |
+| `classics/` | book (.txt) | The Confessions, City of God, Jesus the Christ, The Man Who Was Thursday, St. Francis, … (Gutenberg) | large-book ingest, clustering, **cross-book linking** | works today (move `slipbox-test` here) |
 | `papers/` | PDF | a few open-access arXiv papers on one topic | PDF extraction, dense academic prose, references | PDF extractor |
 | `podcast/` | YouTube | a few episodes of one podcast (good transcripts) | transcript extraction, spoken-language clustering | yt-dlp |
 | `reading-list/` | web articles | a curated URL list on a theme (e.g. essays) | HTML→article, varied authors, dedup | web/URL extractor |
