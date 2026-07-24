@@ -36,7 +36,7 @@ PDF — mostly from [Project Gutenberg](https://www.gutenberg.org) and the
 | Studies in the Odyssey | J. A. K. Thomson, 1914 | HathiTrust (find Archive mirror) |
 | Homer and History | Walter Leaf, 1915 | archive.org `gpl_1735164` |
 | The Unity of Homer | John A. Scott, 1921 | archive.org `unityhomer00scotgoog` |
-| The Composition of Homer's Odyssey | W. J. Woodhouse, 1930 | archive.org `compositionofhom0000wjwo` |
+| The Composition of Homer's Odyssey | W. J. Woodhouse, 1930 | ⚠ borrow-only scan — TODO: find a downloadable copy |
 
 ## Essays / criticism collections (discuss Homer)
 

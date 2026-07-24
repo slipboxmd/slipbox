@@ -15,6 +15,13 @@
     "embeddings",
     "qmd"
   ],
+  "homepage": "https://slipbox.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slipboxmd/slipbox.git",
+    "directory": "packages/core"
+  },
+  "bugs": "https://github.com/slipboxmd/slipbox/issues",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

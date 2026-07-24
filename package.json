@@ -5,6 +5,12 @@
   "description": "Monorepo for the Slipbox harness — a Pi.dev-based Zettelkasten builder and its ecosystem packages.",
   "license": "MIT",
   "author": "Zachary Fleischmann",
+  "homepage": "https://slipbox.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slipboxmd/slipbox.git"
+  },
+  "bugs": "https://github.com/slipboxmd/slipbox/issues",
   "packageManager": "pnpm@10.0.0",
   "engines": {
     "node": ">=22"

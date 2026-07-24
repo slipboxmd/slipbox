@@ -6,6 +6,13 @@
   "license": "MIT",
   "author": "Zachary Fleischmann",
   "keywords": ["pi", "zettelkasten", "slipbox", "notes", "cli", "agent"],
+  "homepage": "https://slipbox.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slipboxmd/slipbox.git",
+    "directory": "packages/cli"
+  },
+  "bugs": "https://github.com/slipboxmd/slipbox/issues",
   "bin": {
     "slipbox": "./dist/bin.js"
   },
