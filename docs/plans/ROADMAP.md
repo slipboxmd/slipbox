@@ -92,5 +92,5 @@ sources + notes):
 | Example | Repo | State |
 | --- | --- | --- |
 | odyssey | `example-odyssey` | complete (public-domain scholarship); no notes yet |
-| ai | `example-ai` | 40-paper corpus; 9 literature notes from 3 papers |
+| ai | `example-ai` | 40-paper corpus **fully processed** — 40 references + 86 literature notes, cross-linked (verified consistent) |
 | sv-titans | `example-sv-titans` | partial — 5 of ~14 authors acquired (182 files); 9 authors to go |
