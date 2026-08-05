@@ -73,8 +73,9 @@ export function Graph({ data }: { data: GraphData }) {
 		nodesRef.current = nodes;
 
 		let width = wrap.clientWidth;
-		// Taller canvas gives the layout more room to breathe before fit-to-view scales it.
-		let height = Math.max(480, Math.min(860, Math.round(window.innerHeight * 0.8)));
+		// A tall canvas — most of the viewport — gives the layout real room before
+		// fit-to-view scales it down, which is what makes the nodes read as spaced out.
+		let height = Math.max(560, Math.min(1100, Math.round(window.innerHeight * 0.86)));
 		const dpr = window.devicePixelRatio || 1;
 
 		const resize = () => {
@@ -97,23 +98,25 @@ export function Graph({ data }: { data: GraphData }) {
 		//   - longer, weaker links: related notes stay connected but sit further apart
 		// Small graphs need gentler settings or they fling themselves apart.
 		const big = nodes.length >= 40;
-		const charge = big ? -340 : -140;
-		const linkDist = big ? 90 : 60;
+		const charge = big ? -320 : -150;
+		const linkDist = big ? 95 : 65;
 		const sim = forceSimulation<SimNode>(nodes)
-			.force("charge", forceManyBody<SimNode>().strength(charge).distanceMax(520))
+			.force("charge", forceManyBody<SimNode>().strength(charge).distanceMax(500))
 			.force(
 				"link",
 				forceLink<SimNode, SimEdge>(edges)
 					.id((d) => (d as SimNode).id)
 					.distance(linkDist)
-					.strength(0.22),
+					.strength(0.2),
 			)
-			// Guarantee a gap around every node so labels have room and the core can't clump.
-			.force("collide", forceCollide<SimNode>().radius((n) => radius(n) + 16).strength(0.9).iterations(2))
+			// A collision gap keeps the layout uniform (no clumps). Note the on-screen
+			// spacing comes mostly from the initial zoom (see fit) — because the graph
+			// fits-to-view, a bigger gap here just inflates the extent and fit cancels
+			// it. Uniform-but-compact is what we want, then start zoomed in.
+			.force("collide", forceCollide<SimNode>().radius((n) => radius(n) + 18).strength(0.9).iterations(2))
 			.force("center", forceCenter(width / 2, height / 2))
-			// Gentle centring pull keeps disconnected notes from drifting off-canvas.
-			.force("x", forceX(width / 2).strength(0.015))
-			.force("y", forceY(height / 2).strength(0.015));
+			.force("x", forceX(width / 2).strength(0.02))
+			.force("y", forceY(height / 2).strength(0.02));
 		simRef.current = sim;
 
 		let colors = themeColors();
@@ -156,7 +159,7 @@ export function Graph({ data }: { data: GraphData }) {
 			// we cull labels that would overlap one already drawn — higher-degree
 			// (more connected) nodes win, so the important labels stay legible instead
 			// of everything colliding into mush.
-			if (scale > 1.1 || hover) {
+			if (scale > 0.8 || hover) {
 				ctx.fillStyle = colors.muted;
 				ctx.font = `${12 / scale}px ui-sans-serif, system-ui, sans-serif`;
 				ctx.textAlign = "center";
@@ -164,7 +167,7 @@ export function Graph({ data }: { data: GraphData }) {
 				const placed: { x: number; y: number; w: number; h: number }[] = [];
 				const ordered = hover ? nodes : [...nodes].sort((a, b) => b.degree - a.degree);
 				for (const n of ordered) {
-					if (scale <= 1.1 && hover?.id !== n.id) continue;
+					if (scale <= 0.8 && hover?.id !== n.id) continue;
 					const label = n.label.length > 42 ? `${n.label.slice(0, 40)}…` : n.label;
 					const w = ctx.measureText(label).width;
 					const cx = n.x ?? 0;
@@ -194,7 +197,13 @@ export function Graph({ data }: { data: GraphData }) {
 			const pad = 110;
 			const w = Math.max(1, maxX - minX);
 			const h = Math.max(1, maxY - minY);
-			const scale = Math.min(4, Math.max(0.2, Math.min((width - pad * 2) / w, (height - pad * 2) / h)));
+			const fitAll = Math.min((width - pad * 2) / w, (height - pad * 2) / h);
+			// A large graph fitted whole is an unreadable dot-cloud (fit-to-view cancels
+			// any spreading). Instead, don't zoom out past a readable floor: the graph
+			// opens spaced-out and centred, and you pan / scroll-out for the overview.
+			// Small graphs (which fit comfortably) still frame in full.
+			const floor = nodes.length > 60 ? 0.9 : nodes.length > 25 ? 0.6 : 0.2;
+			const scale = Math.min(4, Math.max(floor, fitAll));
 			view.current.scale = scale;
 			view.current.x = width / 2 - ((minX + maxX) / 2) * scale;
 			view.current.y = height / 2 - ((minY + maxY) / 2) * scale;
