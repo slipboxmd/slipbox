@@ -1,6 +1,6 @@
 "use client";
 
-import { forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY, type Simulation } from "d3-force";
+import { forceCenter, forceCollide, forceLink, forceManyBody, forceSimulation, forceX, forceY, type Simulation } from "d3-force";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { GraphData, GraphNode } from "@lib/indexes.js";
@@ -73,7 +73,8 @@ export function Graph({ data }: { data: GraphData }) {
 		nodesRef.current = nodes;
 
 		let width = wrap.clientWidth;
-		let height = Math.max(420, Math.min(720, Math.round(window.innerHeight * 0.7)));
+		// Taller canvas gives the layout more room to breathe before fit-to-view scales it.
+		let height = Math.max(480, Math.min(860, Math.round(window.innerHeight * 0.8)));
 		const dpr = window.devicePixelRatio || 1;
 
 		const resize = () => {
@@ -87,21 +88,32 @@ export function Graph({ data }: { data: GraphData }) {
 
 		const radius = (n: SimNode) => 3 + Math.min(7, Math.sqrt(n.degree) * 2);
 
-		// Small graphs need gentler repulsion or they fling themselves off-canvas.
-		const charge = nodes.length < 40 ? -80 : -160;
+		// Layout tuning. Because the graph fits-to-view, uniform repulsion doesn't
+		// change apparent density — it just zooms out. What reads as "too dense" is
+		// the CORE collapsing while the rim stays sparse. So we even the density out:
+		//   - collision: a hard minimum gap, so nodes can't stack in the core
+		//   - stronger, locally-bounded charge: opens the core without inflating the
+		//     overall extent (distanceMax keeps repulsion from acting globally)
+		//   - longer, weaker links: related notes stay connected but sit further apart
+		// Small graphs need gentler settings or they fling themselves apart.
+		const big = nodes.length >= 40;
+		const charge = big ? -340 : -140;
+		const linkDist = big ? 90 : 60;
 		const sim = forceSimulation<SimNode>(nodes)
-			.force("charge", forceManyBody<SimNode>().strength(charge).distanceMax(600))
+			.force("charge", forceManyBody<SimNode>().strength(charge).distanceMax(520))
 			.force(
 				"link",
 				forceLink<SimNode, SimEdge>(edges)
 					.id((d) => (d as SimNode).id)
-					.distance(60)
-					.strength(0.35),
+					.distance(linkDist)
+					.strength(0.22),
 			)
+			// Guarantee a gap around every node so labels have room and the core can't clump.
+			.force("collide", forceCollide<SimNode>().radius((n) => radius(n) + 16).strength(0.9).iterations(2))
 			.force("center", forceCenter(width / 2, height / 2))
 			// Gentle centring pull keeps disconnected notes from drifting off-canvas.
-			.force("x", forceX(width / 2).strength(0.02))
-			.force("y", forceY(height / 2).strength(0.02));
+			.force("x", forceX(width / 2).strength(0.015))
+			.force("y", forceY(height / 2).strength(0.015));
 		simRef.current = sim;
 
 		let colors = themeColors();
@@ -140,15 +152,28 @@ export function Graph({ data }: { data: GraphData }) {
 				}
 			}
 
-			// Labels only when zoomed in enough to read them, or on hover.
-			if (scale > 1.4 || hover) {
+			// Labels once zoomed in enough to read them, or on hover. In dense areas
+			// we cull labels that would overlap one already drawn — higher-degree
+			// (more connected) nodes win, so the important labels stay legible instead
+			// of everything colliding into mush.
+			if (scale > 1.1 || hover) {
 				ctx.fillStyle = colors.muted;
 				ctx.font = `${12 / scale}px ui-sans-serif, system-ui, sans-serif`;
 				ctx.textAlign = "center";
-				for (const n of nodes) {
-					if (scale <= 1.4 && hover?.id !== n.id) continue;
+				const lineH = 15 / scale;
+				const placed: { x: number; y: number; w: number; h: number }[] = [];
+				const ordered = hover ? nodes : [...nodes].sort((a, b) => b.degree - a.degree);
+				for (const n of ordered) {
+					if (scale <= 1.1 && hover?.id !== n.id) continue;
 					const label = n.label.length > 42 ? `${n.label.slice(0, 40)}…` : n.label;
-					ctx.fillText(label, n.x ?? 0, (n.y ?? 0) - radius(n) - 5 / scale);
+					const w = ctx.measureText(label).width;
+					const cx = n.x ?? 0;
+					const cy = (n.y ?? 0) - radius(n) - 5 / scale;
+					const box = { x: cx - w / 2, y: cy - lineH, w, h: lineH };
+					const clashes = placed.some((r) => box.x < r.x + r.w && box.x + box.w > r.x && box.y < r.y + r.h && box.y + box.h > r.y);
+					if (clashes && hover?.id !== n.id) continue;
+					placed.push(box);
+					ctx.fillText(label, cx, cy);
 				}
 			}
 			ctx.restore();
@@ -188,7 +213,8 @@ export function Graph({ data }: { data: GraphData }) {
 		// graph can come up blank. Running the ticks up front is deterministic, and
 		// arriving at a settled, framed graph reads better than a jittering one.
 		sim.stop();
-		const settleTicks = Math.min(400, Math.max(120, nodes.length * 6));
+		// Collision needs more iterations to relax, so give bigger graphs more ticks.
+		const settleTicks = Math.min(600, Math.max(160, nodes.length * 8));
 		sim.tick(settleTicks);
 		fit();
 		paint();
