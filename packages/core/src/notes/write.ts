@@ -98,11 +98,21 @@ export interface LiteratureNoteInput {
 	/** QMD chunk seq indices this idea came from. */
 	chunks?: number[];
 	links?: string[];
+	/**
+	 * Reuse an existing id instead of deriving one from the title — how a note is
+	 * *updated* rather than created (same id → overwrite). Omit to create a new note.
+	 */
+	id?: string;
+	/**
+	 * Extra frontmatter keys to merge in — e.g. `readwise_highlights` provenance
+	 * from the @slipbox/readwise package. Kept generic so core stays source-agnostic.
+	 */
+	extra?: Record<string, unknown>;
 }
 
-/** Write one atomic literature note. */
+/** Write one atomic literature note (or overwrite an existing one when `id` is given). */
 export async function writeLiterature(config: SlipboxConfig, input: LiteratureNoteInput): Promise<NoteRef> {
-	const id = makeId(input.title, config.notes.id_style);
+	const id = input.id ?? makeId(input.title, config.notes.id_style);
 	const data: Record<string, unknown> = {
 		id,
 		type: "literature-note",
@@ -112,6 +122,7 @@ export async function writeLiterature(config: SlipboxConfig, input: LiteratureNo
 		tags: input.tags ?? [],
 		links: input.links ?? [],
 		created: today(),
+		...input.extra,
 	};
 	return persist(config, dirFor(config, "literature_notes"), id, data, input.body.trim() + "\n");
 }

@@ -1,0 +1,55 @@
+{
+  "name": "@slipbox/readwise",
+  "version": "0.0.0",
+  "description": "Readwise source for slipbox \u2014 pull highlights into sources/ and turn them into literature notes, incrementally.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Zachary Fleischmann",
+  "homepage": "https://slipbox.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slipboxmd/slipbox.git",
+    "directory": "packages/readwise"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "skills",
+    "README.md"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/extension.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@slipbox/core": "workspace:*",
+    "yaml": "^2.5.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "^1.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "@types/node": "^22.0.0"
+  }
+}
