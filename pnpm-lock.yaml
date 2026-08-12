@@ -20,10 +20,10 @@ importers:
       '@slipbox/core':
         specifier: workspace:*
         version: link:../core
+    devDependencies:
       '@slipbox/web':
         specifier: workspace:*
         version: link:../web
-    devDependencies:
       typescript:
         specifier: ^5.6.0
         version: 5.9.3

@@ -56,10 +56,31 @@ function fail(err: unknown): never {
 	process.exit(1);
 }
 
+/**
+ * Load the explorer (`@slipbox/web`) on demand. It's not bundled with the CLI —
+ * it pulls in Next + React (~150 MB) and most people just want to ingest. So the
+ * serve/build/site:init commands import it lazily and, if it isn't installed,
+ * point the user at a one-line install rather than failing cryptically.
+ */
+async function loadWeb(): Promise<typeof import("@slipbox/web")> {
+	try {
+		return await import("@slipbox/web");
+	} catch (err) {
+		const code = (err as { code?: string })?.code;
+		if (code === "ERR_MODULE_NOT_FOUND" || /Cannot find (module|package)/.test(String(err))) {
+			console.error(
+				["", "  The explorer isn't installed. Add it with:", "    npm i -g @slipbox/web", `  then re-run \`slipbox ${command}\`.`, ""].join("\n"),
+			);
+			process.exit(1);
+		}
+		throw err;
+	}
+}
+
 const command = args[0];
 
 if (command === "serve") {
-	const { serve } = await import("@slipbox/web");
+	const { serve } = await loadWeb();
 	const port = Number(flag("port") ?? 3000);
 	try {
 		const handle = await serve({ slipboxRoot: process.cwd(), port });
@@ -74,7 +95,7 @@ if (command === "serve") {
 		fail(err);
 	}
 } else if (command === "build") {
-	const { build } = await import("@slipbox/web");
+	const { build } = await loadWeb();
 	try {
 		const { outDir } = await build({ slipboxRoot: process.cwd(), out: flag("out"), basePath: flag("base-path") });
 		console.log(`\n  Static site written to ${outDir}\n`);
@@ -83,7 +104,7 @@ if (command === "serve") {
 		fail(err);
 	}
 } else if (command === "site:init") {
-	const { siteInit } = await import("@slipbox/web");
+	const { siteInit } = await loadWeb();
 	try {
 		const res = await siteInit(process.cwd(), { force: args.includes("--force"), repoName: flag("repo") });
 		for (const p of res.written) console.log(`  wrote    ${p}`);

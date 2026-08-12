@@ -1,6 +1,6 @@
 {
   "name": "@slipbox/web",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "The Slipbox explorer — a Next.js site for reading and navigating a slipbox.",
   "type": "module",
   "license": "MIT",
@@ -21,13 +21,14 @@
   },
   "files": [
     "dist",
-    "app",
+    "site",
     "README.md"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "d3-force": "^3.0.0",
@@ -44,5 +45,11 @@
     "@types/react": "^19.0.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

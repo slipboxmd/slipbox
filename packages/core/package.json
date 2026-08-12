@@ -1,7 +1,7 @@
 {
   "name": "@slipbox/core",
-  "version": "0.0.0",
-  "description": "Core Slipbox harness for Pi \u2014 ingest any source into a flat-markdown Zettelkasten (chunk, embed, cluster, note).",
+  "version": "0.1.0",
+  "description": "Core Slipbox harness for Pi — ingest any source into a flat-markdown Zettelkasten (chunk, embed, cluster, note).",
   "type": "module",
   "license": "MIT",
   "author": "Zachary Fleischmann",
@@ -47,7 +47,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && cp src/qmd/vectors.mjs dist/qmd/vectors.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "sqlite-vec": "^0.1.7-alpha.2",
@@ -68,5 +69,11 @@
     "@slipbox/web": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

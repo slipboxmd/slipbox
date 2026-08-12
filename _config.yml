@@ -1,0 +1,26 @@
+# GitHub Pages landing page for slipbox.md.
+# Renders index.md with a built-in GitHub theme. Everything else in the repo is
+# excluded so the site is just the landing page.
+title: slipbox
+description: Turn any source — a book, PDF, article, video, or podcast — into a Zettelkasten of flat-markdown notes you own.
+theme: jekyll-theme-cayman
+# Served from the custom domain (see CNAME), so the site lives at the root.
+baseurl: ""
+url: "https://slipbox.md"
+
+exclude:
+  - packages
+  - examples
+  - apps
+  - docs
+  - node_modules
+  - .github
+  - README.md
+  - LICENSE
+  - turbo.json
+  - package.json
+  - pnpm-workspace.yaml
+  - pnpm-lock.yaml
+  - tsconfig.json
+  - biome.json
+  - vitest.config.ts

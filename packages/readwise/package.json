@@ -1,7 +1,7 @@
 {
   "name": "@slipbox/readwise",
   "version": "0.0.0",
-  "description": "Readwise source for slipbox \u2014 pull highlights into sources/ and turn them into literature notes, incrementally.",
+  "description": "Readwise source for slipbox — pull highlights into sources/ and turn them into literature notes, incrementally.",
   "type": "module",
   "license": "MIT",
   "author": "Zachary Fleischmann",
@@ -51,5 +51,6 @@
     "typescript": "^5.6.0",
     "vitest": "^2.1.0",
     "@types/node": "^22.0.0"
-  }
+  },
+  "private": true
 }
