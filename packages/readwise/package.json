@@ -39,7 +39,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@slipbox/core": "workspace:*",
+    "@slipbox/core": "workspace:^",
+    "typebox": "^1.3.0",
     "yaml": "^2.5.0"
   },
   "peerDependencies": {
@@ -47,7 +48,6 @@
   },
   "devDependencies": {
     "@earendil-works/pi-coding-agent": "*",
-    "typebox": "^1.3.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0",
     "@types/node": "^22.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@slipbox/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Slipbox — a Zettelkasten harness for Pi. Build and grow a flat-markdown slipbox from any source.",
   "type": "module",
   "license": "MIT",
@@ -38,7 +38,7 @@
     "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
-    "@slipbox/core": "workspace:*",
+    "@slipbox/core": "workspace:^",
     "@earendil-works/pi-coding-agent": "^0.81.1"
   },
   "devDependencies": {
