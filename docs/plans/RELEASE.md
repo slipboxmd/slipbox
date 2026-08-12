@@ -34,6 +34,31 @@ pnpm build && pnpm test          # must be green
 # leaves the parent "unclean" even though nothing in the packages changed. The
 # tarballs come from each package's built dist/ + files globs, so this is safe.
 pnpm -r publish --access public --no-git-checks
+```
+
+### 2FA on publish
+
+npm requires 2FA (or a bypass token) to publish, and a one-time code is single-use
+— so a bare `pnpm -r publish` fails partway (it can't reuse one code across three
+packages). Two options:
+
+**A. Automation token (recommended — one-shot, works in CI later).** Create a
+Granular Access Token (npmjs.com → Access Tokens) with Read+Write on the `slipbox`
+package and `@slipbox` scope and 2FA-bypass enabled (or a classic "Automation"
+token, which bypasses 2FA by design). Then:
+
+```bash
+npm config set //registry.npmjs.org/:_authToken=<TOKEN>
+pnpm -r publish --access public --no-git-checks   # no OTP prompts
+```
+
+**B. One code per package (no token).** Run each with a FRESH code from your
+authenticator, in dependency order:
+
+```bash
+pnpm --filter @slipbox/core publish --access public --no-git-checks --otp=<code>
+pnpm --filter @slipbox/web  publish --access public --no-git-checks --otp=<code>
+pnpm --filter slipbox       publish --access public --no-git-checks --otp=<code>
 
 # Verify
 npm view slipbox version         # → 0.1.0
