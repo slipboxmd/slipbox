@@ -29,7 +29,11 @@ pnpm build && pnpm test          # must be green
 
 # Publish core + web + cli. pnpm converts workspace:* deps to 0.1.0 and orders
 # by dependency. readwise is private, so it's skipped automatically.
-pnpm -r publish --access public
+# --no-git-checks: publishing doesn't require a clean tree. The example corpora are
+# git submodules that may be mid-build (or just have a derived .qmd/ index), which
+# leaves the parent "unclean" even though nothing in the packages changed. The
+# tarballs come from each package's built dist/ + files globs, so this is safe.
+pnpm -r publish --access public --no-git-checks
 
 # Verify
 npm view slipbox version         # → 0.1.0
