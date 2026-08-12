@@ -38,7 +38,7 @@ export function registerServe(pi: ExtensionAPI): void {
 			if (!web) {
 				return say(
 					"The explorer package isn't installed.\n" +
-						"  Install it with:  npm i -g slipbox   (it's bundled with the CLI)\n" +
+						"  Install it with:  npm i -g @slipbox/web\n" +
 						"Then run `slipbox serve` in this folder, or call this tool again.",
 					{ error: "web-missing" },
 				);

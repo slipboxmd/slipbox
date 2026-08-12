@@ -1,4 +1,4 @@
-# slipbox
+# @slipbox/cli
 
 The **Slipbox** command — a standalone [Pi](https://pi.dev)-powered harness for
 building and growing a flat-markdown Zettelkasten. Run `slipbox` in any directory
@@ -11,7 +11,7 @@ settings** (from `~/.pi/agent`). Log in once with Pi and `slipbox` just works.
 ## Install (planned, once published)
 
 ```bash
-npm install -g slipbox
+npm install -g @slipbox/cli
 slipbox                     # in any folder
 ```
 
@@ -51,7 +51,7 @@ cd ~/some-folder
 node /ABSOLUTE/PATH/TO/slipbox-harness/packages/cli/dist/bin.js
 
 # Option B — a real `slipbox` command on your PATH:
-pnpm --filter slipbox link --global
+pnpm --filter @slipbox/cli link --global
 cd ~/some-folder && slipbox
 ```
 

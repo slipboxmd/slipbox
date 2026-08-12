@@ -1,5 +1,5 @@
 {
-  "name": "slipbox",
+  "name": "@slipbox/cli",
   "version": "0.1.0",
   "description": "Slipbox — a Zettelkasten harness for Pi. Build and grow a flat-markdown slipbox from any source.",
   "type": "module",
@@ -20,6 +20,9 @@
     "directory": "packages/cli"
   },
   "bugs": "https://github.com/slipboxmd/slipbox/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "slipbox": "./dist/bin.js"
   },

@@ -8,20 +8,28 @@ they need your npm login, GitHub settings, and DNS).
 
 | Package | npm name | Notes |
 | --- | --- | --- |
-| CLI | `slipbox` | `npm i -g slipbox`. Base install is lean — the explorer is opt-in. |
-| Core | `@slipbox/core` | The ingest → cluster → note harness (Pi extension + skill). |
+| CLI | `@slipbox/cli` | `npm i -g @slipbox/cli`, then run `slipbox`. Base install is lean — the explorer is opt-in. |
+| Core | `@slipbox/core` | The ingest → cluster → note harness (Pi extension + skill). Pulled in automatically by the CLI. |
 | Explorer | `@slipbox/web` | `slipbox serve` / `build`. Pulled in only when you `npm i -g @slipbox/web`. |
+
+Everything the beta ships is under the **`@slipbox`** scope — there is no unscoped
+package, so a single scope-level token (or org membership) authorizes all publishes.
+The `slipbox` *command* still comes from `@slipbox/cli` via its `bin`.
 
 Held back: **`@slipbox/readwise`** is marked `private` — it hasn't been run against
 a live Readwise account yet. Flip `"private": false` and bump its version when ready.
 
-All three are at **0.1.0**, published to the default `latest` tag (so
-`npm i -g slipbox` gets it). Scoped packages carry `publishConfig.access: public`.
+All three are at **0.1.0**, published to the default `latest` tag. Each scoped
+package carries `publishConfig.access: public`.
+
+> Already out: **`@slipbox/web@0.1.0`** is published. Only `@slipbox/core` and
+> `@slipbox/cli` remain for the first release.
 
 ## Publish to npm
 
-Prereqs: `npm login` as a user with publish rights on the `slipbox` package name
-and the `@slipbox` org (you created it). Then, from the repo root:
+Prereqs: `npm login` (or a token) for an account with publish rights on the
+`@slipbox` org (you created it) — that one scope covers every package. Then, from
+the repo root:
 
 ```bash
 pnpm install
@@ -39,13 +47,15 @@ pnpm -r publish --access public --no-git-checks
 ### 2FA on publish
 
 npm requires 2FA (or a bypass token) to publish, and a one-time code is single-use
-— so a bare `pnpm -r publish` fails partway (it can't reuse one code across three
-packages). Two options:
+— so a bare `pnpm -r publish` fails partway (it can't reuse one code across
+packages). Because everything is now under the `@slipbox` scope, a **scope-level
+Granular Access Token covers all of them** (no "all packages" grant needed — that
+was only required back when the CLI was the unscoped `slipbox` name). Two options:
 
 **A. Automation token (recommended — one-shot, works in CI later).** Create a
-Granular Access Token (npmjs.com → Access Tokens) with Read+Write on the `slipbox`
-package and `@slipbox` scope and 2FA-bypass enabled (or a classic "Automation"
-token, which bypasses 2FA by design). Then:
+Granular Access Token (npmjs.com → Access Tokens) with Read+Write scoped to the
+`@slipbox` org and 2FA-bypass enabled (or a classic "Automation" token, which
+bypasses 2FA by design). Then:
 
 ```bash
 npm config set //registry.npmjs.org/:_authToken=<TOKEN>
@@ -53,16 +63,16 @@ pnpm -r publish --access public --no-git-checks   # no OTP prompts
 ```
 
 **B. One code per package (no token).** Run each with a FRESH code from your
-authenticator, in dependency order:
+authenticator, in dependency order (core before the CLI that depends on it; web
+is already published):
 
 ```bash
 pnpm --filter @slipbox/core publish --access public --no-git-checks --otp=<code>
-pnpm --filter @slipbox/web  publish --access public --no-git-checks --otp=<code>
-pnpm --filter slipbox       publish --access public --no-git-checks --otp=<code>
+pnpm --filter @slipbox/cli  publish --access public --no-git-checks --otp=<code>
 
 # Verify
-npm view slipbox version         # → 0.1.0
-npm i -g slipbox @tobilu/qmd      # smoke test in a scratch dir
+npm view @slipbox/cli version      # → 0.1.0
+npm i -g @slipbox/cli @tobilu/qmd  # smoke test in a scratch dir; then run `slipbox`
 ```
 
 Then tag the release:
@@ -75,7 +85,7 @@ Notes:
 - `pnpm -r publish` publishes every non-private workspace package. Because
   `@slipbox/readwise` is `private`, only the three intended packages go out.
 - If npm rejects a scoped package as private, double-check `publishConfig.access`
-  is `public` in that package.json (it is, for core + web).
+  is `public` in that package.json (it is, for cli + core + web).
 
 ## Landing page — slipbox.md via GitHub Pages
 

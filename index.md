@@ -15,7 +15,7 @@ bundling.
 ## Install
 
 ```bash
-npm install -g slipbox @tobilu/qmd
+npm install -g @slipbox/cli @tobilu/qmd
 qmd pull            # one-time: download the local models
 cd my-slipbox
 slipbox             # opens the harness; use /init to scaffold a slipbox
