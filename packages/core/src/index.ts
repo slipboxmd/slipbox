@@ -18,12 +18,14 @@ export type { SlipboxConfig } from "./config/types.js";
 export { ingestSource } from "./pipeline/ingest.js";
 export type { IngestResult, IngestCluster } from "./pipeline/ingest.js";
 export { cluster } from "./pipeline/cluster.js";
-export { autolink } from "./pipeline/link.js";
+export { autolink, autolinkPermanent } from "./pipeline/link.js";
 export type { AutolinkOptions, AutolinkResult } from "./pipeline/link.js";
+export { gather } from "./pipeline/gather.js";
+export type { GatherCandidate, GatherOptions, GatherResult, GatherMode } from "./pipeline/gather.js";
 
 // Notes
-export { writeReference, writeLiterature, updateReference, writeExtracted, writeSourceCapture } from "./notes/write.js";
-export type { NoteRef, LiteratureNoteInput } from "./notes/write.js";
+export { writeReference, writeLiterature, writePermanent, updateReference, writeExtracted, writeSourceCapture } from "./notes/write.js";
+export type { NoteRef, LiteratureNoteInput, PermanentNoteInput } from "./notes/write.js";
 export { makeId } from "./notes/ids.js";
 
 // QMD + vectors
