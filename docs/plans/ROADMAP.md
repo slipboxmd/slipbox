@@ -81,7 +81,24 @@ serif prose on a ~68ch measure, light/dark following the OS. Full design record 
    already has a MOC template waiting for content.
 2. **Phase 3 curation** — dedup / merge / prune / refine tools.
 3. **Phase 5 permanent notes** — the literature→permanent promotion workflow.
-   (The explorer's permanent-note template is likewise ready.)
+   (The explorer's permanent-note template is likewise ready.) *In design — the
+   author-assisted authoring flow, not auto-generation.*
+
+## QoL / CLI ergonomics backlog
+
+Small, mostly-independent quality-of-life features (candidates, unprioritized):
+
+- **`slipbox sessions` / resume a specific session** — build on `--resume`
+  (most-recent) with a picker to jump back into any past run in a folder
+  (Pi stores sessions per-cwd).
+- **`slipbox status` at the shell** — surface the in-harness `slipbox_status`
+  summary (sources, notes, unlinked) non-interactively, without opening the TUI.
+- **`slipbox ingest <file|url>` as a direct subcommand** — one-shot, scriptable
+  ingest that runs and exits (great with `--yolo` for batch).
+- **Watch a `sources/` inbox** — drop files in; slipbox auto-ingests new ones.
+- **`slipbox open`** — `serve` + open the explorer in the browser in one step.
+
+Shipped QoL: `slipbox --resume` (reopen last session), branded startup splash.
 
 ## Example corpora
 
