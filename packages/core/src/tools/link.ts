@@ -1,7 +1,7 @@
 import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { loadConfig } from "../config/slipbox-config.js";
-import { autolink } from "../pipeline/link.js";
+import { autolink, autolinkPermanent } from "../pipeline/link.js";
 import { embed, ensureIndex, isAvailable, update } from "../qmd/cli.js";
 import { say, type OnUpdate } from "./result.js";
 import { qmdMissing } from "./search.js";
@@ -11,10 +11,11 @@ export function registerAutolink(pi: ExtensionAPI): void {
 		name: "slipbox_autolink",
 		label: "Autolink notes",
 		description:
-			"Connect literature notes to each other by similarity, across ALL sources in the slipbox. Run this once notes exist " +
-			"(e.g. after ingesting a source + writing its notes). By default it's INCREMENTAL — it only links the newly-written " +
-			"notes (those without links yet) into the network, so it stays fast as the slipbox grows; pass relink_all to " +
-			"recompute every note. Links are mutual and merged into frontmatter. Idempotent.",
+			"Connect notes to each other by similarity, across ALL sources in the slipbox. Runs two passes: literature-to-literature " +
+			"and permanent-to-permanent. Run this once notes exist (e.g. after ingesting a source + writing its notes, or after " +
+			"writing a permanent note). By default it's INCREMENTAL — it only links the newly-written notes (those without links " +
+			"yet) into the network, so it stays fast as the slipbox grows; pass relink_all to recompute every note. Links are " +
+			"mutual and merged into frontmatter. Idempotent.",
 		promptSnippet: "Link newly-written notes into the network (run after writing a source's notes).",
 		parameters: Type.Object({
 			max_per_note: Type.Optional(Type.Integer({ description: "Max links to add per note (default 6)" })),
@@ -31,19 +32,21 @@ export function registerAutolink(pi: ExtensionAPI): void {
 			await embed(config.root);
 
 			onUpdate?.(say("Linking related notes…"));
-			const result = await autolink(config, {
+			const linkOpts = {
 				k: params.max_per_note ?? 6,
 				threshold: params.threshold ?? 0.55,
 				minLinks: 2,
 				floor: 0.45,
 				relinkAll: params.relink_all ?? false,
-			});
+			};
+			const result = await autolink(config, linkOpts);
+			const permanent = await autolinkPermanent(config, linkOpts);
 
-			const msg =
-				result.notes === 0
-					? "No literature notes found to link yet."
-					: `Linked ${result.linkedFrom} note(s) into the network (of ${result.notes} total) — ${result.linksAdded} links added.`;
-			return say(msg, { autolink: result });
+			const parts: string[] = [];
+			if (result.notes === 0) parts.push("No literature notes found to link yet.");
+			else parts.push(`Literature: linked ${result.linkedFrom} note(s) of ${result.notes} — ${result.linksAdded} links added.`);
+			if (permanent.notes > 0) parts.push(`Permanent: linked ${permanent.linkedFrom} note(s) of ${permanent.notes} — ${permanent.linksAdded} links added.`);
+			return say(parts.join(" "), { autolink: result, autolinkPermanent: permanent });
 		},
 	});
 }

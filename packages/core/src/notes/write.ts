@@ -127,6 +127,74 @@ export async function writeLiterature(config: SlipboxConfig, input: LiteratureNo
 	return persist(config, dirFor(config, "literature_notes"), id, data, input.body.trim() + "\n");
 }
 
+export interface PermanentNoteInput {
+	title: string;
+	/** The author's prose — a permanent note is always in the author's voice. */
+	body: string;
+	/** Links DOWN to the literature notes this idea synthesizes, e.g. `[[literature-notes/<id>]]`. */
+	drawsOn: string[];
+	/** Links ACROSS to related permanent notes, e.g. `[[permanent-notes/<id>]]`. */
+	links?: string[];
+	tags?: string[];
+	/** Reuse an existing id to overwrite (how a permanent note is edited). Omit to create. */
+	id?: string;
+}
+
+/** Strip a wikilink/markdown link down to its root-relative target with no `.md`. */
+function linkTarget(link: string): string {
+	const md = link.match(/\]\(([^)]+)\)/);
+	const target = md ? md[1]! : link.replace(/\[\[|\]\]/g, "").trim();
+	return target.replace(/\.md$/, "");
+}
+
+/**
+ * The `sources` provenance of a permanent note is DERIVED at write time from the
+ * `source:` frontmatter of each literature note it draws on — distinct, in the
+ * order first seen. A draws_on link that can't be resolved is skipped (the note
+ * may have been renamed); it never blocks the write.
+ */
+async function deriveSources(config: SlipboxConfig, drawsOn: string[]): Promise<string[]> {
+	const sources: string[] = [];
+	const seen = new Set<string>();
+	for (const link of drawsOn) {
+		const path = join(config.root, `${linkTarget(link)}.md`);
+		if (!existsSync(path)) continue;
+		try {
+			const { data } = parseFrontmatter(await readFile(path, "utf8"));
+			const source = typeof data.source === "string" ? data.source : undefined;
+			if (source && !seen.has(source)) {
+				seen.add(source);
+				sources.push(source);
+			}
+		} catch {
+			/* unreadable note — skip its provenance rather than fail the write */
+		}
+	}
+	return sources;
+}
+
+/**
+ * Write one permanent note (or overwrite an existing one when `id` is given). A
+ * permanent note sits ABOVE the literature notes: it links down to them
+ * (`draws_on`) and across to related permanent notes (`links`). Its `sources` are
+ * derived from the draws_on notes' `source:` fields. The body is the author's
+ * prose — this writer never generates it; the agent persists what the author wrote.
+ */
+export async function writePermanent(config: SlipboxConfig, input: PermanentNoteInput): Promise<NoteRef> {
+	const id = input.id ?? makeId(input.title, config.notes.id_style);
+	const data: Record<string, unknown> = {
+		id,
+		type: "permanent-note",
+		title: input.title,
+		draws_on: input.drawsOn,
+		links: input.links ?? [],
+		sources: await deriveSources(config, input.drawsOn),
+		tags: input.tags ?? [],
+		created: today(),
+	};
+	return persist(config, dirFor(config, "permanent_notes"), id, data, input.body.trim() + "\n");
+}
+
 export interface ReferenceSummaryInput {
 	/** The reference link/id from ingest, e.g. `[[references/<id>]]` or `references/<id>`. */
 	reference: string;

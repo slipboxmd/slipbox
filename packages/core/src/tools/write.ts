@@ -1,7 +1,7 @@
 import { Type } from "typebox";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { loadConfig } from "../config/slipbox-config.js";
-import { updateReference, writeLiterature } from "../notes/write.js";
+import { updateReference, writeLiterature, writePermanent } from "../notes/write.js";
 
 export function registerWrite(pi: ExtensionAPI): void {
 	pi.registerTool({
@@ -70,6 +70,49 @@ export function registerWrite(pi: ExtensionAPI): void {
 				literatureLinks: params.literature_links,
 			});
 			return { content: [{ type: "text", text: `Updated reference ${ref.link} with summary + ${params.literature_links.length} links` }], details: ref };
+		},
+	});
+}
+
+export function registerWritePermanent(pi: ExtensionAPI): void {
+	pi.registerTool({
+		name: "slipbox_write_permanent",
+		label: "Write permanent note",
+		description:
+			"Persist ONE permanent note — an atomic, evergreen idea in the AUTHOR'S OWN WORDS, synthesized from literature notes. " +
+			"NEVER call this with prose you generated on your own: the body must be what the author wrote or explicitly approved. " +
+			"Discover where a permanent note is warranted with slipbox_gather, help the author compress the notes into one, then " +
+			"persist it here. `draws_on` links DOWN to the literature notes; `links` link ACROSS to related permanent notes; " +
+			"`sources` are derived automatically. After writing, run slipbox_reindex then slipbox_autolink to embed + cross-link it.",
+		promptSnippet: "Persist a permanent note the author wrote, linked down to its literature notes.",
+		parameters: Type.Object({
+			title: Type.String({ description: "A single-sentence claim — the idea itself" }),
+			body: Type.String({ description: "The author's OWN prose. Never your unaided generation — what the author wrote or approved." }),
+			draws_on: Type.Array(Type.String(), { description: "Links DOWN to the literature notes synthesized, e.g. [[literature-notes/<id>]]" }),
+			links: Type.Optional(Type.Array(Type.String(), { description: "Links ACROSS to related permanent notes, e.g. [[permanent-notes/<id>]]" })),
+			tags: Type.Optional(Type.Array(Type.String(), { description: "lowercase, hyphenated topics" })),
+			id: Type.Optional(Type.String({ description: "Existing permanent-note id to overwrite (edit in place). Omit to create." })),
+		}),
+		async execute(
+			_id: string,
+			params: { title: string; body: string; draws_on: string[]; links?: string[]; tags?: string[]; id?: string },
+			_signal: unknown,
+			_onUpdate: unknown,
+			ctx: ExtensionContext,
+		) {
+			const config = loadConfig(ctx.cwd);
+			const ref = await writePermanent(config, {
+				title: params.title,
+				body: params.body,
+				drawsOn: params.draws_on,
+				links: params.links,
+				tags: params.tags,
+				id: params.id,
+			});
+			return {
+				content: [{ type: "text", text: `Wrote permanent note ${ref.link} → ${ref.relPath} (draws on ${params.draws_on.length} note(s)). Now run slipbox_reindex + slipbox_autolink.` }],
+				details: ref,
+			};
 		},
 	});
 }
