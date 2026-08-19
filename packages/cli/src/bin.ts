@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
+import { resolveLaunchOptions } from "./options.js";
 
 const args = process.argv.slice(2);
 
@@ -16,6 +17,8 @@ if (args.includes("--help") || args.includes("-h") || args[0] === "help") {
 			"",
 			"Usage:",
 			"  slipbox                  Open the harness in the current folder",
+			"  slipbox --resume         Reopen the last session in this folder (or start",
+			"                           fresh if there is none)",
 			"  slipbox --yolo           One-shot: ingest runs straight through without",
 			"                           pausing for review",
 			"",
@@ -125,12 +128,14 @@ if (command === "serve") {
 	console.error(`slipbox: unknown command "${command}". Try \`slipbox --help\`.`);
 	process.exit(1);
 } else {
+	const { resume, yolo } = resolveLaunchOptions(args);
+
 	// One-shot mode: the extension reads this when deciding how to pace ingestion.
-	if (args.includes("--yolo")) process.env.SLIPBOX_YOLO = "1";
+	if (yolo) process.env.SLIPBOX_YOLO = "1";
 
 	// Defer the heavy Pi SDK import until we actually launch.
 	const { launch } = await import("./launch.js");
-	launch().catch((err: unknown) => {
+	launch({ resume }).catch((err: unknown) => {
 		const msg = err instanceof Error ? (err.stack ?? err.message) : String(err);
 		console.error(`\nslipbox: ${msg}`);
 		console.error(
