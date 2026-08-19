@@ -43,6 +43,9 @@ importers:
       '@earendil-works/pi-coding-agent':
         specifier: '*'
         version: 0.81.1(ws@8.21.1)(zod@4.4.3)
+      '@earendil-works/pi-tui':
+        specifier: '*'
+        version: 0.81.1
       '@slipbox/web':
         specifier: workspace:*
         version: link:../web

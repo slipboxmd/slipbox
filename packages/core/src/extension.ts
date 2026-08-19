@@ -19,6 +19,7 @@ import { registerServe } from "./tools/serve.js";
 import { registerSources } from "./tools/sources.js";
 import { registerStatus } from "./tools/status.js";
 import { registerWrite } from "./tools/write.js";
+import { createSlipboxHeader } from "./ui/header.js";
 
 const HOUSE_STYLE_MARKER = "slipbox:house-style";
 
@@ -42,6 +43,7 @@ export default function slipbox(pi: ExtensionAPI): void {
 	pi.on("session_start", async (_event: unknown, ctx: ExtensionContext) => {
 		injected = false;
 		ctx.ui.setTitle?.("slipbox");
+		ctx.ui.setHeader?.(createSlipboxHeader());
 		try {
 			const config = loadConfig(ctx.cwd);
 			if (config.found) ctx.ui.setStatus?.("slipbox", `slipbox: ${config.root}`);
