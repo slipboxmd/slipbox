@@ -14,7 +14,7 @@ import {
  * @slipbox/core extension + skill, reusing the user's existing Pi login, models,
  * and settings via the shared agent dir (~/.pi/agent).
  */
-export async function launch(): Promise<void> {
+export async function launch(options: { resume?: boolean } = {}): Promise<void> {
 	const cwd = process.cwd();
 
 	const createRuntime: CreateAgentSessionRuntimeFactory = async ({ cwd, agentDir, sessionManager, sessionStartEvent }) => {
@@ -34,7 +34,9 @@ export async function launch(): Promise<void> {
 	const runtime = await createAgentSessionRuntime(createRuntime, {
 		cwd,
 		agentDir: getAgentDir(), // ~/.pi/agent — reuses existing login + model settings
-		sessionManager: SessionManager.create(cwd),
+		// continueRecent reopens the most recent session for this cwd (starting a
+		// fresh one if none exists); create always starts a new session.
+		sessionManager: options.resume ? SessionManager.continueRecent(cwd) : SessionManager.create(cwd),
 	});
 
 	const mode = new InteractiveMode(runtime, {
