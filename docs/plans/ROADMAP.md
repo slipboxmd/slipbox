@@ -82,7 +82,8 @@ serif prose on a ~68ch measure, light/dark following the OS. Full design record 
 2. **Phase 3 curation** — dedup / merge / prune / refine tools.
 3. **Phase 5 permanent notes** — the literature→permanent promotion workflow.
    (The explorer's permanent-note template is likewise ready.) *In design — the
-   author-assisted authoring flow, not auto-generation.*
+   author-assisted authoring flow, not auto-generation. See
+   `plans/PERMANENT_NOTES.md` (covers the agent persona / "soul" too).*
 
 ## QoL / CLI ergonomics backlog
 
@@ -99,6 +100,16 @@ Small, mostly-independent quality-of-life features (candidates, unprioritized):
 - **`slipbox open`** — `serve` + open the explorer in the browser in one step.
 
 Shipped QoL: `slipbox --resume` (reopen last session), branded startup splash.
+
+## Agent personality / "soul"
+
+Give the slipbox agent a defined character: a **helpful, thorough research and
+writing assistant** whose job is to help the author (the user) think, research,
+and write — not to produce notes on its own. Cross-cutting: it shapes the system
+prompt / house voice and, especially, the human-in-the-loop stance of the
+permanent-notes authoring flow (Phase 5). Needs its own design pass. Distinct
+from per-slipbox `houseStyle` (which governs note *conventions*, not the agent's
+*persona*).
 
 ## Example corpora
 
